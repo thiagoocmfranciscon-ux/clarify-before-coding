@@ -26,7 +26,7 @@ function toText(v: unknown): string {
 /** Formulário genérico de criação/edição. Edição usa controle de versão (otimista). */
 export function CrudDialog({ open, onOpenChange, table, title, fields, row, extra, invalidate, idKey = "id" }: {
   open: boolean; onOpenChange: (o: boolean) => void; table: string; title: string; fields: FieldDef[];
-  row?: Row | null; extra?: Record<string, unknown>; invalidate: unknown[][]; idKey?: string;
+  row?: Row | null | undefined; extra?: Record<string, unknown> | undefined; invalidate: unknown[][]; idKey?: string;
 }) {
   const [vals, setVals] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
