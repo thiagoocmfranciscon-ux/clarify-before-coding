@@ -14,7 +14,7 @@ const search = z.object({ from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   validateSearch: search,
-  head: () => ({ meta: [{ title: "Dashboard — Nobre Empilhadeiras" }, { name: "description", content: "Indicadores operacionais." }, { property: "og:title", content: "Dashboard — Nobre" }, { property: "og:description", content: "Indicadores operacionais." }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Empilha Nobre" }, { name: "description", content: "Indicadores operacionais." }, { property: "og:title", content: "Dashboard — Empilha Nobre" }, { property: "og:description", content: "Indicadores operacionais." }] }),
   component: Dashboard,
 });
 

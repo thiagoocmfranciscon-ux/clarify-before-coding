@@ -10,7 +10,7 @@ import { PERM } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
-  head: () => ({ meta: [{ title: "Auditoria — Nobre" }, { name: "description", content: "Registro de alterações e exportações." }, { property: "og:title", content: "Auditoria — Nobre" }, { property: "og:description", content: "Registro de alterações." }] }),
+  head: () => ({ meta: [{ title: "Auditoria — Empilha Nobre" }, { name: "description", content: "Registro de alterações e exportações." }, { property: "og:title", content: "Auditoria — Empilha Nobre" }, { property: "og:description", content: "Registro de alterações." }] }),
   component: Page,
 });
 

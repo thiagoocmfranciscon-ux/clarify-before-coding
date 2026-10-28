@@ -17,7 +17,7 @@ const contactFields: FieldDef[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/clientes/$id")({
-  head: () => ({ meta: [{ title: "Cliente — Nobre" }, { name: "description", content: "Detalhe do cliente." }, { property: "og:title", content: "Cliente — Nobre" }, { property: "og:description", content: "Detalhe do cliente." }] }),
+  head: () => ({ meta: [{ title: "Cliente — Empilha Nobre" }, { name: "description", content: "Detalhe do cliente." }, { property: "og:title", content: "Cliente — Empilha Nobre" }, { property: "og:description", content: "Detalhe do cliente." }] }),
   component: Page,
 });
 

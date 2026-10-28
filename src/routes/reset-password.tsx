@@ -10,9 +10,9 @@ import { friendlyError } from "@/lib/errors";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Definir senha — Nobre Empilhadeiras" },
+      { title: "Definir senha — Empilha Nobre" },
       { name: "description", content: "Defina uma nova senha de acesso." },
-      { property: "og:title", content: "Definir senha — Nobre Empilhadeiras" },
+      { property: "og:title", content: "Definir senha — Empilha Nobre" },
       { property: "og:description", content: "Defina uma nova senha de acesso." },
     ],
   }),

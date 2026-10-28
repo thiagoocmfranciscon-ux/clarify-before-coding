@@ -17,7 +17,7 @@ const EXP = { combustivel: "Combustível", manutencao: "Manutenção", seguro: "
 const KIND = { odometro: "Leitura de odômetro", manutencao: "Manutenção", revisao: "Revisão" };
 
 export const Route = createFileRoute("/_authenticated/frotas/$id")({
-  head: () => ({ meta: [{ title: "Veículo — Nobre" }, { name: "description", content: "Eventos e despesas do veículo." }, { property: "og:title", content: "Veículo — Nobre" }, { property: "og:description", content: "Eventos e despesas do veículo." }] }),
+  head: () => ({ meta: [{ title: "Veículo — Empilha Nobre" }, { name: "description", content: "Eventos e despesas do veículo." }, { property: "og:title", content: "Veículo — Empilha Nobre" }, { property: "og:description", content: "Eventos e despesas do veículo." }] }),
   component: Page,
 });
 

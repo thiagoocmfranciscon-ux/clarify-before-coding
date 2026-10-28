@@ -62,15 +62,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Nobre Empilhadeiras — Gestão de Manutenção" },
-      { name: "description", content: "Gestão de manutenção, ordens de serviço, estoque e frotas da Nobre Empilhadeiras." },
+      { title: "Empilha Nobre — Gestão de Manutenção" },
+      { name: "description", content: "Gestão de manutenção, ordens de serviço, estoque e frotas da Empilha Nobre." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },

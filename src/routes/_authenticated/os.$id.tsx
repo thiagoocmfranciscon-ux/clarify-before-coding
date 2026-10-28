@@ -22,7 +22,7 @@ const DEFAULT_CHECKLIST = ["Inspeção de segurança realizada", "Teste de funci
 const EXP = { deslocamento: "Deslocamento", terceiros: "Serviço de terceiros", alimentacao: "Alimentação", hospedagem: "Hospedagem", outros: "Outros" };
 
 export const Route = createFileRoute("/_authenticated/os/$id")({
-  head: () => ({ meta: [{ title: "Detalhe da OS — Nobre" }, { name: "description", content: "Execução, peças, custos e histórico da ordem de serviço." }, { property: "og:title", content: "Detalhe da OS — Nobre" }, { property: "og:description", content: "Detalhe da ordem de serviço." }] }),
+  head: () => ({ meta: [{ title: "Detalhe da OS — Empilha Nobre" }, { name: "description", content: "Execução, peças, custos e histórico da ordem de serviço." }, { property: "og:title", content: "Detalhe da OS — Empilha Nobre" }, { property: "og:description", content: "Detalhe da ordem de serviço." }] }),
   component: Page,
 });
 

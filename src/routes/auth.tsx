@@ -11,10 +11,10 @@ import { friendlyError } from "@/lib/errors";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Nobre Empilhadeiras" },
-      { name: "description", content: "Acesso restrito à equipe da Nobre Empilhadeiras." },
-      { property: "og:title", content: "Entrar — Nobre Empilhadeiras" },
-      { property: "og:description", content: "Acesso restrito à equipe da Nobre Empilhadeiras." },
+      { title: "Entrar — Empilha Nobre" },
+      { name: "description", content: "Acesso restrito à equipe da Empilha Nobre." },
+      { property: "og:title", content: "Entrar — Empilha Nobre" },
+      { property: "og:description", content: "Acesso restrito à equipe da Empilha Nobre." },
     ],
   }),
   component: AuthPage,

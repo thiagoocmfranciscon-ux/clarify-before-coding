@@ -13,7 +13,7 @@ import { PERM } from "@/lib/domain";
 import { addDays, formatDate, formatNumber, spDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/frotas/")({
-  head: () => ({ meta: [{ title: "Frotas — Nobre" }, { name: "description", content: "Veículos de apoio." }, { property: "og:title", content: "Frotas — Nobre" }, { property: "og:description", content: "Veículos de apoio." }] }),
+  head: () => ({ meta: [{ title: "Frotas — Empilha Nobre" }, { name: "description", content: "Veículos de apoio." }, { property: "og:title", content: "Frotas — Empilha Nobre" }, { property: "og:description", content: "Veículos de apoio." }] }),
   component: Page,
 });
 

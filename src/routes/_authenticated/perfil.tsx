@@ -13,7 +13,7 @@ import { friendlyError } from "@/lib/errors";
 import { createAvatarUpload, finalizeAvatar, getAvatarUrl } from "@/lib/attachments.functions";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
-  head: () => ({ meta: [{ title: "Meu Perfil — Nobre" }, { name: "description", content: "Seus dados, foto e senha." }, { property: "og:title", content: "Meu Perfil — Nobre" }, { property: "og:description", content: "Seus dados, foto e senha." }] }),
+  head: () => ({ meta: [{ title: "Meu Perfil — Empilha Nobre" }, { name: "description", content: "Seus dados, foto e senha." }, { property: "og:title", content: "Meu Perfil — Empilha Nobre" }, { property: "og:description", content: "Seus dados, foto e senha." }] }),
   component: Page,
 });
 

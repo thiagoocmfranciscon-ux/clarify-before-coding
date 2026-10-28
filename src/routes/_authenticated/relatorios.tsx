@@ -13,7 +13,7 @@ import { friendlyError } from "@/lib/errors";
 import { exportPdf, exportXlsx, type Column } from "@/lib/reports";
 
 export const Route = createFileRoute("/_authenticated/relatorios")({
-  head: () => ({ meta: [{ title: "Relatórios — Nobre" }, { name: "description", content: "Relatórios em PDF e Excel." }, { property: "og:title", content: "Relatórios — Nobre" }, { property: "og:description", content: "Relatórios em PDF e Excel." }] }),
+  head: () => ({ meta: [{ title: "Relatórios — Empilha Nobre" }, { name: "description", content: "Relatórios em PDF e Excel." }, { property: "og:title", content: "Relatórios — Empilha Nobre" }, { property: "og:description", content: "Relatórios em PDF e Excel." }] }),
   component: Page,
 });
 
