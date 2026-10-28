@@ -107,7 +107,7 @@ function Parts() {
   );
 }
 
-export function MoveDialog({ part, onClose, preset }: { part: { id: string; code: string; allowsFraction: boolean }; onClose: () => void; preset?: { type?: string; qty?: string; workOrderId?: string; requestId?: string } }) {
+function MoveDialog({ part, onClose, preset }: { part: { id: string; code: string; allowsFraction: boolean }; onClose: () => void; preset?: { type?: string; qty?: string; workOrderId?: string; requestId?: string } }) {
   const qc = useQueryClient(); const lk = useLookups();
   const [key] = useState(() => crypto.randomUUID());
   const [f, setF] = useState({ type: preset?.type ?? "entrada", qty: preset?.qty ?? "", cost: "", reason: "", supplier: "", doc: "", wo: preset?.workOrderId ?? "" });
