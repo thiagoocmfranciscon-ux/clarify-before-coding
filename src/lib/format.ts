@@ -38,13 +38,13 @@ export function spDate(at: Date = new Date()): string {
 
 export function addDays(isoDate: string, days: number): string {
   const [y, m, d] = isoDate.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d + days));
+  const dt = new Date(Date.UTC(y!, m! - 1, d! + days));
   return dt.toISOString().slice(0, 10);
 }
 
 export function firstDayOfMonth(isoDate: string, monthsBack = 0): string {
   const [y, m] = isoDate.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1 - monthsBack, 1));
+  const dt = new Date(Date.UTC(y!, m! - 1 - monthsBack, 1));
   return dt.toISOString().slice(0, 10);
 }
 

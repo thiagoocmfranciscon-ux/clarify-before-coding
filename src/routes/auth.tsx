@@ -36,7 +36,7 @@ function AuthPage() {
     if (busy) return;
     setError(null); setInfo(null);
     const parsed = emailSchema.safeParse(email);
-    if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
+    if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? "E-mail inválido"); return; }
     setBusy(true);
     try {
       if (mode === "login") {

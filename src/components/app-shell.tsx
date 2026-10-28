@@ -140,7 +140,7 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     { key: "technicians", label: "Técnicos", open: () => navigate({ to: "/tecnicos" }) },
   ];
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} shouldFilter={false}>
+    <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput placeholder="Digite ao menos 2 caracteres…" value={q} onValueChange={setQ} aria-label="Busca global" />
       <CommandList>
         <CommandEmpty>{loading ? "Buscando…" : q.trim().length < 2 ? "Digite para buscar." : "Nada encontrado."}</CommandEmpty>
