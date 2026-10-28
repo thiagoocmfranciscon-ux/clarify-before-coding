@@ -12,8 +12,7 @@ import { PERM } from "@/lib/domain";
 import { formatBRL } from "@/lib/format";
 
 const fields: FieldDef[] = [
-  { key: "code", label: "Código", required: true, hint: "Letras, números e hífen" },
-  { key: "name", label: "Nome", required: true },
+    { key: "name", label: "Nome", required: true },
   { key: "specialty", label: "Especialidade" },
   { key: "status", label: "Situação", type: "select", required: true, options: [{ value: "disponivel", label: "Disponível" }, { value: "em_servico", label: "Em serviço" }, { value: "afastado", label: "Afastado" }, { value: "inativo", label: "Inativo" }] },
 ];
