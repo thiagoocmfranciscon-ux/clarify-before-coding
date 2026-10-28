@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, ErrorState, LoadingRows, PageHeader, Pill } from "@/components/kit";
 import { GenericStatus, WoStatusBadge } from "@/components/status";
-import { CrudDialog, Table, td, useArchive, type FieldDef } from "@/components/crud";
+import { ArchivedToggle, CrudDialog, Table, td, useArchive, type FieldDef } from "@/components/crud";
 import { equipmentFields } from "@/components/fields";
 import { AttachmentsPanel } from "@/components/attachments-panel";
 import { NewWorkOrderDialog } from "@/components/wo-new";
@@ -86,7 +86,7 @@ function Page() {
           {!!readings.length && <ul className="mt-3 space-y-1 text-xs text-muted-foreground">{readings.slice(0, 6).map((r) => <li key={r.id}>{formatDateTime(r.read_at)} — {formatNumber(r.value)} h {r.is_correction && <Pill tone="warning">correção</Pill>}</li>)}</ul>}
         </Card>
         <Card className="lg:col-span-2">
-          <div className="mb-2 flex items-center justify-between"><h2 className="font-semibold">Planos de manutenção</h2>{mgr && <Button size="sm" variant="outline" onClick={() => setPlan(null)}><Plus className="mr-1 h-4 w-4" />Plano</Button>}</div>
+          <div className="mb-2 flex items-center justify-between"><h2 className="font-semibold">Planos de manutenção</h2><div className="flex gap-2"><ArchivedToggle value={showArch} onChange={setShowArch} />{mgr && <Button size="sm" variant="outline" onClick={() => setPlan(null)}><Plus className="mr-1 h-4 w-4" />Plano</Button>}</div></div>
           {!plans.filter((p) => showArch ? !!p.archived_at : !p.archived_at).length ? <p className="text-sm text-muted-foreground">Nenhum plano cadastrado.</p> : (
             <ul className="divide-y text-sm">{plans.filter((p) => showArch ? !!p.archived_at : !p.archived_at).map((p) => {
               const d = maintenanceDue({ ...p, interval_hours: p.interval_hours === null ? null : Number(p.interval_hours), last_done_hours: p.last_done_hours === null ? null : Number(p.last_done_hours) }, e.hour_meter === null ? null : Number(e.hour_meter), today);

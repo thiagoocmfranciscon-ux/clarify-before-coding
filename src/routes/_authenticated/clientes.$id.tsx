@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { MessageCircle, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, EmptyState, ErrorState, LoadingRows, PageHeader } from "@/components/kit";
 import { GenericStatus } from "@/components/status";
-import { ArchivedToggle, CrudDialog, Table, td, phoneParse, useArchive, type FieldDef }
-import { WhatsAppIcon, waLink } from "@/components/icons"; from "@/components/crud";
+import { ArchivedToggle, CrudDialog, Table, td, phoneParse, useArchive, type FieldDef } from "@/components/crud";
+import { WhatsAppIcon, waLink } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
