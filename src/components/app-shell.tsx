@@ -53,6 +53,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const curPath = useRouterState({ select: (st) => st.location.pathname });
+  useEffect(() => {
+    if (me.mustChangePassword && curPath !== "/perfil") navigate({ to: "/perfil", replace: true });
+  }, [me.mustChangePassword, curPath, navigate]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -70,10 +74,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   const side = (
-    <div className="flex h-full flex-col overflow-y-auto bg-sidebar py-5">
-      <div className="px-5 pb-6"><BrandLockup inverted /></div>
-      <SidebarNav role={me.role} onNavigate={() => setOpen(false)} />
-      <div className="mt-4 border-t border-sidebar-border px-3 pt-4">
+    <div className="flex h-full min-h-0 flex-col bg-sidebar py-5">
+      <div className="shrink-0 px-5 pb-6"><BrandLockup inverted /></div>
+      <div className="min-h-0 flex-1 overflow-y-auto"><SidebarNav role={me.role} onNavigate={() => setOpen(false)} /></div>
+      <div className="mt-4 shrink-0 bg-sidebar border-t border-sidebar-border px-3 pt-4">
         <Link to="/perfil" onClick={() => setOpen(false)} className="flex min-h-11 items-center gap-3 rounded-md px-3 text-sm text-sidebar-foreground hover:bg-sidebar-accent">
           <User className="h-4 w-4" aria-hidden />
           <span className="min-w-0 flex-1">
@@ -106,7 +110,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
           <div className="ml-auto hidden text-right text-xs text-muted-foreground md:block">{me.organizationName}</div>
         </header>
-        <main id="conteudo" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">{children}</main>
+        <main id="conteudo" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">{me.mustChangePassword && <div role="alert" className="mb-4 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning-foreground">Por segurança, defina uma nova senha antes de continuar.</div>}{children}</main>
       </div>
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
