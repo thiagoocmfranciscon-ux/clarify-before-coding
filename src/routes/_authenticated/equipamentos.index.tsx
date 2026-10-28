@@ -8,17 +8,11 @@ import { GenericStatus } from "@/components/status";
 import { CrudDialog, Table, td, type FieldDef } from "@/components/crud";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { equipmentFields } from "@/components/fields";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
 import { formatNumber } from "@/lib/format";
 
-export const equipmentFields: FieldDef[] = [
-  { key: "serial", label: "Número de série", required: true },
-  { key: "manufacturer", label: "Fabricante", required: true },
-  { key: "model", label: "Modelo", required: true },
-  { key: "type", label: "Tipo", required: true, hint: "Ex.: Empilhadeira a combustão, elétrica, transpaleteira" },
-  { key: "status", label: "Situação", type: "select", required: true, options: [{ value: "operacional", label: "Operacional" }, { value: "em_manutencao", label: "Em manutenção" }, { value: "parado", label: "Parado" }, { value: "inativo", label: "Inativo" }] },
-];
 
 export const Route = createFileRoute("/_authenticated/equipamentos/")({
   head: () => ({ meta: [{ title: "Equipamentos — Nobre" }, { name: "description", content: "Equipamentos dos clientes." }, { property: "og:title", content: "Equipamentos — Nobre" }, { property: "og:description", content: "Equipamentos dos clientes." }] }),
@@ -51,7 +45,6 @@ function Page() {
           ))}
         </Table>
       )}
-      {cust === "" && null}
       <CrudDialog open={open} onOpenChange={(o) => { setOpen(o); setCust(""); }} table="equipment" title="equipamento" fields={fields} invalidate={[["equipment"]]} />
     </>
   );

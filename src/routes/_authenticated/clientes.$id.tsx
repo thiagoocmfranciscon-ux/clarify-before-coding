@@ -9,8 +9,7 @@ import { CrudDialog, Table, td, phoneParse, useArchive, type FieldDef } from "@/
 import { Button } from "@/components/ui/button";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
-import { customerFields } from "./clientes.index";
-import { equipmentFields } from "./equipamentos.index";
+import { customerFields, equipmentFields } from "@/components/fields";
 
 const contactFields: FieldDef[] = [
   { key: "name", label: "Nome", required: true }, { key: "role", label: "Cargo" },

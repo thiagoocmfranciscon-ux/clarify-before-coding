@@ -5,22 +5,13 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, LoadingRows, PageHeader } from "@/components/kit";
 import { GenericStatus } from "@/components/status";
-import { CrudDialog, Table, td, docParse, ufParse, type FieldDef } from "@/components/crud";
+import { CrudDialog, Table, td, type FieldDef } from "@/components/crud";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { customerFields } from "@/components/fields";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
 
-export const customerFields: FieldDef[] = [
-  { key: "legal_name", label: "Razão social / nome", required: true },
-  { key: "trade_name", label: "Nome fantasia" },
-  { key: "document", label: "CPF/CNPJ", parse: docParse },
-  { key: "segment", label: "Segmento" },
-  { key: "city", label: "Cidade" },
-  { key: "uf", label: "UF", parse: ufParse },
-  { key: "status", label: "Situação", type: "select", required: true, options: [{ value: "ativo", label: "Ativo" }, { value: "inativo", label: "Inativo" }] },
-  { key: "notes", label: "Observações", type: "textarea" },
-];
 
 export const Route = createFileRoute("/_authenticated/clientes/")({
   head: () => ({ meta: [{ title: "Clientes — Nobre" }, { name: "description", content: "Cadastro de clientes da Nobre Empilhadeiras." }, { property: "og:title", content: "Clientes — Nobre" }, { property: "og:description", content: "Cadastro de clientes." }] }),
