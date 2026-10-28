@@ -57,7 +57,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -70,7 +70,6 @@
 
 :root {
   --radius: 0.5rem;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --background: oklch(0.984 0.003 247.858);
   --foreground: oklch(0.279 0.041 260.031);
   --card: oklch(1 0 0);
@@ -119,7 +118,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   }
   :focus-visible {
     outline: 2px solid var(--color-ring);
