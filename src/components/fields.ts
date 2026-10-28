@@ -1,3 +1,4 @@
+import { isValidPlate, normalizePlate } from "@/lib/domain";
 import { docParse, ufParse, type FieldDef } from "@/components/crud";
 
 export const customerFields: FieldDef[] = [
@@ -19,7 +20,6 @@ export const equipmentFields: FieldDef[] = [
   { key: "status", label: "Situação", type: "select", required: true, options: [{ value: "operacional", label: "Operacional" }, { value: "em_manutencao", label: "Em manutenção" }, { value: "parado", label: "Parado" }, { value: "inativo", label: "Inativo" }] },
 ];
 
-import { isValidPlate, normalizePlate } from "@/lib/domain";
 export const plateParse = (v: string) => { const p = normalizePlate(v); return isValidPlate(p) ? p : { error: "Placa inválida (ABC1234 ou ABC1D23)" }; };
 const intParse = (v: string) => (/^\d+$/.test(v.replace(/\./g, "")) ? Number(v.replace(/\./g, "")) : { error: "Número inteiro" });
 export const vehicleFields = (drivers: { value: string; label: string }[]): FieldDef[] => [
