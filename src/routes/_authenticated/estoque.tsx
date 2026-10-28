@@ -19,7 +19,7 @@ import { friendlyError } from "@/lib/errors";
 const MOV = { abertura: "Saldo inicial", entrada: "Entrada", saida: "Saída", ajuste_entrada: "Ajuste (+)", ajuste_saida: "Ajuste (−)", estorno: "Estorno" } as const;
 
 export const Route = createFileRoute("/_authenticated/estoque")({
-  validateSearch: (s: Record<string, unknown>) => ({ alert: typeof s.alert === "string" ? s.alert : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ alert: typeof s["alert"] === "string" ? s["alert"] : undefined }),
   head: () => ({ meta: [{ title: "Estoque de Peças — Nobre" }, { name: "description", content: "Peças, saldos e movimentações." }, { property: "og:title", content: "Estoque de Peças — Nobre" }, { property: "og:description", content: "Peças, saldos e movimentações." }] }),
   component: Page,
 });

@@ -40,7 +40,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
       const t = supabase.from(table as "customers");
       const rid = row?.[idKey] as string | undefined;
       if (rid) {
-        const { data, error } = await t.update(payload as never).eq(idKey as "id", rid).eq("version", row.version as number).select("id");
+        const { data, error } = await t.update(payload as never).eq(idKey as "id", rid).eq("version", row!.version as number).select("id");
         if (error) throw error;
         if (!data?.length) throw new Error("Este registro foi alterado por outra pessoa. Recarregue para conferir.");
       } else {
@@ -72,7 +72,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
         <DialogHeader><DialogTitle>{row?.[idKey] ? `Editar ${title}` : `Novo ${title}`}</DialogTitle></DialogHeader>
         <form className="grid gap-3" onSubmit={(ev) => { ev.preventDefault(); submit(); }} noValidate>
           {fields.map((f) => (
-            <Field key={f.key} id={`f-${f.key}`} label={f.label} required={f.required} error={errors[f.key]} hint={f.hint}>
+            <Field key={f.key} id={`f-${f.key}`} label={f.label} required={!!f.required} error={errors[f.key]} hint={f.hint}>
               {f.type === "select" ? (
                 <select id={`f-${f.key}`} className={selectClass} value={vals[f.key] ?? ""} onChange={(ev) => setVals((p) => ({ ...p, [f.key]: ev.target.value }))}>
                   {!f.required && <option value="">—</option>}
