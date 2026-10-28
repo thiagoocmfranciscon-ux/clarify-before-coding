@@ -26,8 +26,9 @@ export const inviteUser = createServerFn({ method: "POST" })
     if (error) throw new Error("Falha ao registrar convite");
     const redirect = new URL(data.redirectTo);
     const { error: ie } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, { redirectTo: `${redirect.origin}/reset-password` });
-    if (ie && !/already|registered/i.test(ie.message)) throw new Error("Convite registrado, mas o e-mail não pôde ser enviado. Tente reenviar.");
-    return { ok: true, existingUser: !!ie };
+    const existingUser = !!ie && /already|registered/i.test(ie.message);
+    const { data: link } = await supabaseAdmin.auth.admin.generateLink({ type: "recovery", email: data.email, options: { redirectTo: `${redirect.origin}/reset-password` } });
+    return { ok: true, existingUser, emailSent: !ie, link: link?.properties?.action_link ?? null };
   });
 
 export const revokeInvitation = createServerFn({ method: "POST" })
