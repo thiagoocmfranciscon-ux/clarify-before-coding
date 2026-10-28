@@ -57,7 +57,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -69,14 +70,14 @@
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.984 0.003 247.858);
+  --radius: 0.75rem;
+  --background: oklch(0.982 0.003 80);
   --foreground: oklch(0.279 0.041 260.031);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.279 0.041 260.031);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.279 0.041 260.031);
-  --primary: oklch(0.577 0.233 27.6);
+  --primary: oklch(0.58 0.235 27.5);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.279 0.041 260.031);
@@ -100,7 +101,7 @@
   --chart-3: oklch(0.55 0.13 163);
   --chart-4: oklch(0.7 0.16 70);
   --chart-5: oklch(0.45 0.03 257);
-  --sidebar: oklch(0.18 0.012 262);
+  --sidebar: oklch(0.17 0.004 270);
   --sidebar-foreground: oklch(0.85 0.01 255);
   --sidebar-primary: oklch(0.577 0.233 27.6);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -118,7 +119,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
   }
   :focus-visible {
     outline: 2px solid var(--color-ring);
@@ -128,3 +129,14 @@
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 }
+
+@layer base {
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
+:root {
+  --shadow-soft: 0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent), 0 8px 24px -12px color-mix(in oklab, var(--foreground) 18%, transparent);
+  --gradient-brand: radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--primary) 85%, white) 0%, var(--primary) 45%, color-mix(in oklab, var(--primary) 70%, black) 100%);
+}
+@utility shadow-soft { box-shadow: var(--shadow-soft); }
+@utility bg-brand-gradient { background-image: var(--gradient-brand); }
+@utility nav-active { box-shadow: inset 3px 0 0 var(--sidebar-primary); }
