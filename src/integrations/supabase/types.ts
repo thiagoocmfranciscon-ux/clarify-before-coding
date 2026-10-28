@@ -1546,6 +1546,56 @@ export type Database = {
     Functions: {
       accept_invitation: { Args: never; Returns: Json }
       can_view_wo: { Args: { _wo: string }; Returns: boolean }
+      create_work_order: {
+        Args: {
+          p_customer_id: string
+          p_description: string
+          p_due_date: string
+          p_equipment_id: string
+          p_hour_meter: number
+          p_parent_id?: string
+          p_priority: Database["public"]["Enums"]["wo_priority"]
+          p_technician_id: string
+          p_type: Database["public"]["Enums"]["wo_type"]
+        }
+        Returns: {
+          cancel_reason: string | null
+          canceled_at: string | null
+          checklist: Json
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string
+          diagnosis: string | null
+          diagnosis_started_at: string | null
+          due_date: string | null
+          equipment_id: string
+          execution_started_at: string | null
+          hour_meter_reading: number | null
+          id: string
+          number: string
+          opened_at: string
+          organization_id: string
+          parent_work_order_id: string | null
+          priority: Database["public"]["Enums"]["wo_priority"]
+          solution: string | null
+          status: Database["public"]["Enums"]["wo_status"]
+          tech_completed_at: string | null
+          type: Database["public"]["Enums"]["wo_type"]
+          updated_at: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "work_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      dashboard_kpis: { Args: { p_from: string; p_to: string }; Returns: Json }
+      global_search: { Args: { p_q: string }; Returns: Json }
       has_any_role: {
         Args: {
           _org: string
@@ -1555,9 +1605,116 @@ export type Database = {
       }
       is_assigned: { Args: { _wo: string }; Returns: boolean }
       is_member: { Args: { _org: string }; Returns: boolean }
+      log_export: {
+        Args: { p_kind: string; p_params: Json }
+        Returns: undefined
+      }
       my_org: { Args: never; Returns: string }
       my_role: { Args: never; Returns: Database["public"]["Enums"]["app_role"] }
       my_technician_id: { Args: never; Returns: string }
+      reject_part_request: {
+        Args: { p_id: string; p_note: string }
+        Returns: undefined
+      }
+      stock_move: {
+        Args: {
+          p_document_ref: string
+          p_idempotency_key: string
+          p_part_id: string
+          p_part_request_id?: string
+          p_qty: number
+          p_reason: string
+          p_reversed_movement_id?: string
+          p_supplier_id: string
+          p_type: Database["public"]["Enums"]["stock_mov_type"]
+          p_unit_cost: number
+          p_work_order_id: string
+        }
+        Returns: {
+          avg_cost_after: number
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          document_ref: string | null
+          id: string
+          idempotency_key: string
+          organization_id: string
+          part_id: string
+          part_request_id: string | null
+          qty: number
+          reason: string | null
+          reversed_movement_id: string | null
+          supplier_id: string | null
+          total_cost: number
+          type: Database["public"]["Enums"]["stock_mov_type"]
+          unit_cost: number
+          work_order_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "stock_movements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      wo_allowed_next: {
+        Args: { p_from: Database["public"]["Enums"]["wo_status"] }
+        Returns: Database["public"]["Enums"]["wo_status"][]
+      }
+      wo_assign: {
+        Args: {
+          p_primary: boolean
+          p_remove?: boolean
+          p_technician_id: string
+          p_wo: string
+        }
+        Returns: undefined
+      }
+      wo_costs: { Args: { p_wo: string }; Returns: Json }
+      wo_transition: {
+        Args: {
+          p_expected_version: number
+          p_reason: string
+          p_return_parts?: boolean
+          p_to: Database["public"]["Enums"]["wo_status"]
+          p_wo: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          canceled_at: string | null
+          checklist: Json
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string
+          diagnosis: string | null
+          diagnosis_started_at: string | null
+          due_date: string | null
+          equipment_id: string
+          execution_started_at: string | null
+          hour_meter_reading: number | null
+          id: string
+          number: string
+          opened_at: string
+          organization_id: string
+          parent_work_order_id: string | null
+          priority: Database["public"]["Enums"]["wo_priority"]
+          solution: string | null
+          status: Database["public"]["Enums"]["wo_status"]
+          tech_completed_at: string | null
+          type: Database["public"]["Enums"]["wo_type"]
+          updated_at: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "work_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "gestor" | "tecnico" | "almoxarife" | "leitura"
