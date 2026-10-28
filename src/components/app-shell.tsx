@@ -37,7 +37,7 @@ function SidebarNav({ role, onNavigate }: { role: AppRole; onNavigate?: () => vo
         return (
           <Link key={n.to} to={n.to} onClick={onNavigate}
             className={cn("flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
-              active ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}
+              active ? "nav-active bg-sidebar-accent text-sidebar-accent-foreground [&>svg]:text-sidebar-primary" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}
             aria-current={active ? "page" : undefined}>
             <n.icon className="h-4 w-4 shrink-0" aria-hidden />{n.label}
           </Link>
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   const side = (
-    <div className="flex h-full flex-col bg-sidebar py-5">
+    <div className="flex h-full flex-col overflow-y-auto bg-sidebar py-5">
       <div className="px-5 pb-6"><BrandLockup inverted /></div>
       <SidebarNav role={me.role} onNavigate={() => setOpen(false)} />
       <div className="mt-4 border-t border-sidebar-border px-3 pt-4">
