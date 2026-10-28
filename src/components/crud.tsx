@@ -24,9 +24,9 @@ function toText(v: unknown): string {
 }
 
 /** Formulário genérico de criação/edição. Edição usa controle de versão (otimista). */
-export function CrudDialog({ open, onOpenChange, table, title, fields, row, extra, invalidate }: {
+export function CrudDialog({ open, onOpenChange, table, title, fields, row, extra, invalidate, idKey = "id" }: {
   open: boolean; onOpenChange: (o: boolean) => void; table: string; title: string; fields: FieldDef[];
-  row?: Row | null; extra?: Record<string, unknown>; invalidate: unknown[][];
+  row?: Row | null; extra?: Record<string, unknown>; invalidate: unknown[][]; idKey?: string;
 }) {
   const [vals, setVals] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,8 +38,9 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
   const m = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
       const t = supabase.from(table as "customers");
-      if (row?.id) {
-        const { data, error } = await t.update(payload as never).eq("id", row.id).eq("version", row.version as number).select("id");
+      const rid = row?.[idKey] as string | undefined;
+      if (rid) {
+        const { data, error } = await t.update(payload as never).eq(idKey as "id", rid).eq("version", row.version as number).select("id");
         if (error) throw error;
         if (!data?.length) throw new Error("Este registro foi alterado por outra pessoa. Recarregue para conferir.");
       } else {
@@ -68,7 +69,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
   return (
     <Dialog open={open} onOpenChange={(o) => !m.isPending && onOpenChange(o)}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader><DialogTitle>{row?.id ? `Editar ${title}` : `Novo ${title}`}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{row?.[idKey] ? `Editar ${title}` : `Novo ${title}`}</DialogTitle></DialogHeader>
         <form className="grid gap-3" onSubmit={(ev) => { ev.preventDefault(); submit(); }} noValidate>
           {fields.map((f) => (
             <Field key={f.key} id={`f-${f.key}`} label={f.label} required={f.required} error={errors[f.key]} hint={f.hint}>

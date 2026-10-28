@@ -62,7 +62,7 @@ function Page() {
       )}
       <CrudDialog open={row !== undefined} onOpenChange={(o) => !o && setRow(undefined)} table="technicians" title="técnico" fields={fields} row={row} invalidate={[["technicians"]]} />
       {priv && <CrudDialog open onOpenChange={(o) => !o && setPriv(null)} table="technician_private" title="dados restritos" fields={privFields}
-        row={priv.row ? { ...priv.row, id: priv.id } : null} extra={{ technician_id: priv.id }} invalidate={[["technicians"]]} />}
+        idKey="technician_id" row={priv.row} extra={{ technician_id: priv.id }} invalidate={[["technicians"]]} />}
     </>
   );
 }
