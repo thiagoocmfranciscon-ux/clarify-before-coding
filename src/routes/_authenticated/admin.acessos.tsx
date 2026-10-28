@@ -14,7 +14,7 @@ import { friendlyError } from "@/lib/errors";
 import { inviteUser, listMembers, revokeInvitation, updateMember } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/acessos")({
-  head: () => ({ meta: [{ title: "Administração de Acessos — Nobre" }, { name: "description", content: "Convites, papéis e revogação de acesso." }, { property: "og:title", content: "Administração de Acessos — Nobre" }, { property: "og:description", content: "Convites e papéis." }] }),
+  head: () => ({ meta: [{ title: "Administração de Acessos — Empilha Nobre" }, { name: "description", content: "Convites, papéis e revogação de acesso." }, { property: "og:title", content: "Administração de Acessos — Empilha Nobre" }, { property: "og:description", content: "Convites e papéis." }] }),
   component: Page,
 });
 

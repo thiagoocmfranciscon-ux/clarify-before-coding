@@ -23,7 +23,7 @@ const privFields: FieldDef[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/tecnicos")({
-  head: () => ({ meta: [{ title: "Técnicos — Nobre" }, { name: "description", content: "Equipe técnica." }, { property: "og:title", content: "Técnicos — Nobre" }, { property: "og:description", content: "Equipe técnica." }] }),
+  head: () => ({ meta: [{ title: "Técnicos — Empilha Nobre" }, { name: "description", content: "Equipe técnica." }, { property: "og:title", content: "Técnicos — Empilha Nobre" }, { property: "og:description", content: "Equipe técnica." }] }),
   component: Page,
 });
 

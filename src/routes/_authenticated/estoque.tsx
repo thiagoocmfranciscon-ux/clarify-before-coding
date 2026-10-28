@@ -20,7 +20,7 @@ const MOV = { abertura: "Saldo inicial", entrada: "Entrada", saida: "Saída", aj
 
 export const Route = createFileRoute("/_authenticated/estoque")({
   validateSearch: (s: Record<string, unknown>) => ({ alert: typeof s["alert"] === "string" ? s["alert"] : undefined }),
-  head: () => ({ meta: [{ title: "Estoque de Peças — Nobre" }, { name: "description", content: "Peças, saldos e movimentações." }, { property: "og:title", content: "Estoque de Peças — Nobre" }, { property: "og:description", content: "Peças, saldos e movimentações." }] }),
+  head: () => ({ meta: [{ title: "Estoque de Peças — Empilha Nobre" }, { name: "description", content: "Peças, saldos e movimentações." }, { property: "og:title", content: "Estoque de Peças — Empilha Nobre" }, { property: "og:description", content: "Peças, saldos e movimentações." }] }),
   component: Page,
 });
 

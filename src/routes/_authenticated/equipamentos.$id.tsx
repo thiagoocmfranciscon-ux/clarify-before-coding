@@ -26,7 +26,7 @@ const planFields: FieldDef[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/equipamentos/$id")({
-  head: () => ({ meta: [{ title: "Equipamento — Nobre" }, { name: "description", content: "Histórico e planos do equipamento." }, { property: "og:title", content: "Equipamento — Nobre" }, { property: "og:description", content: "Histórico e planos do equipamento." }] }),
+  head: () => ({ meta: [{ title: "Equipamento — Empilha Nobre" }, { name: "description", content: "Histórico e planos do equipamento." }, { property: "og:title", content: "Equipamento — Empilha Nobre" }, { property: "og:description", content: "Histórico e planos do equipamento." }] }),
   component: Page,
 });
 

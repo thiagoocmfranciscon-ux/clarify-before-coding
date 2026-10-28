@@ -22,7 +22,7 @@ const search = z.object({
 
 export const Route = createFileRoute("/_authenticated/os/")({
   validateSearch: search,
-  head: () => ({ meta: [{ title: "Ordens de Serviço — Nobre" }, { name: "description", content: "Lista de ordens de serviço." }, { property: "og:title", content: "Ordens de Serviço — Nobre" }, { property: "og:description", content: "Lista de ordens de serviço." }] }),
+  head: () => ({ meta: [{ title: "Ordens de Serviço — Empilha Nobre" }, { name: "description", content: "Lista de ordens de serviço." }, { property: "og:title", content: "Ordens de Serviço — Empilha Nobre" }, { property: "og:description", content: "Lista de ordens de serviço." }] }),
   component: WoList,
 });
 

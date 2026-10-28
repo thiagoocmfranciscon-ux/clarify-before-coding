@@ -14,7 +14,7 @@ import { PERM } from "@/lib/domain";
 
 
 export const Route = createFileRoute("/_authenticated/clientes/")({
-  head: () => ({ meta: [{ title: "Clientes — Nobre" }, { name: "description", content: "Cadastro de clientes da Nobre Empilhadeiras." }, { property: "og:title", content: "Clientes — Nobre" }, { property: "og:description", content: "Cadastro de clientes." }] }),
+  head: () => ({ meta: [{ title: "Clientes — Empilha Nobre" }, { name: "description", content: "Cadastro de clientes da Empilha Nobre." }, { property: "og:title", content: "Clientes — Empilha Nobre" }, { property: "og:description", content: "Cadastro de clientes." }] }),
   component: Page,
 });
 

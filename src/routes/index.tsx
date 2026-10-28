@@ -5,9 +5,9 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Nobre Empilhadeiras — Gestão de Manutenção e Operações" },
+      { title: "Empilha Nobre — Gestão de Manutenção e Operações" },
       { name: "description", content: "Sistema interno de manutenção, ordens de serviço, estoque e frotas." },
-      { property: "og:title", content: "Nobre Empilhadeiras — Gestão de Manutenção" },
+      { property: "og:title", content: "Empilha Nobre — Gestão de Manutenção" },
       { property: "og:description", content: "Sistema interno de manutenção, ordens de serviço, estoque e frotas." },
     ],
   }),

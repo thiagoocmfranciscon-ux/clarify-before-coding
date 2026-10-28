@@ -15,7 +15,7 @@ import { formatNumber } from "@/lib/format";
 
 
 export const Route = createFileRoute("/_authenticated/equipamentos/")({
-  head: () => ({ meta: [{ title: "Equipamentos — Nobre" }, { name: "description", content: "Equipamentos dos clientes." }, { property: "og:title", content: "Equipamentos — Nobre" }, { property: "og:description", content: "Equipamentos dos clientes." }] }),
+  head: () => ({ meta: [{ title: "Equipamentos — Empilha Nobre" }, { name: "description", content: "Equipamentos dos clientes." }, { property: "og:title", content: "Equipamentos — Empilha Nobre" }, { property: "og:description", content: "Equipamentos dos clientes." }] }),
   component: Page,
 });
 
