@@ -38,7 +38,7 @@ async function pdfDoc() {
   const doc = await PDFDocument.create(); const font = await doc.embedFont(StandardFonts.Helvetica); const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   let page = doc.addPage([595, 842]); let y = 800;
   const red = rgb(0.9, 0.035, 0.08);
-  page.drawText("NOBRE EMPILHADEIRAS", { x: 40, y: 810, size: 14, font: bold, color: red });
+  page.drawText("EMPILHA NOBRE", { x: 40, y: 810, size: 14, font: bold, color: red });
   const ensure = (h: number) => { if (y - h < 40) { page = doc.addPage([595, 842]); y = 800; } };
   const text = (s: string, o: { size?: number; b?: boolean; x?: number } = {}) => {
     const size = o.size ?? 9; const f = o.b ? bold : font; const maxW = 515 - (o.x ?? 0);
