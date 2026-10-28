@@ -39,7 +39,7 @@ function Page() {
     queryFn: async () => {
       const [e, p, w, r] = await Promise.all([
         supabase.from("equipment").select("*, customers(id, legal_name)").eq("id", id).single(),
-        supabase.from("maintenance_plans").select("*").eq("equipment_id", id).is("archived_at", null).order("name"),
+        supabase.from("maintenance_plans").select("*").eq("equipment_id", id).order("name"),
         supabase.from("work_orders").select("id, number, type, status, opened_at, description").eq("equipment_id", id).order("opened_at", { ascending: false }).limit(50),
         supabase.from("equipment_readings").select("id, value, read_at, is_correction, note").eq("equipment_id", id).order("read_at", { ascending: false }).limit(20),
       ]);
@@ -49,6 +49,7 @@ function Page() {
   });
   const arch = useArchive("equipment", [["equipment-detail", id], ["equipment"]]);
   const archPlan = useArchive("maintenance_plans", [["equipment-detail", id]]);
+  const [showArch, setShowArch] = useState(false);
   const addReading = useMutation({
     mutationFn: async () => {
       const v = parseDecimal(reading); if (v === null || Number.isNaN(v) || v < 0) throw new Error("Horímetro inválido");
@@ -86,14 +87,14 @@ function Page() {
         </Card>
         <Card className="lg:col-span-2">
           <div className="mb-2 flex items-center justify-between"><h2 className="font-semibold">Planos de manutenção</h2>{mgr && <Button size="sm" variant="outline" onClick={() => setPlan(null)}><Plus className="mr-1 h-4 w-4" />Plano</Button>}</div>
-          {!plans.length ? <p className="text-sm text-muted-foreground">Nenhum plano cadastrado.</p> : (
-            <ul className="divide-y text-sm">{plans.map((p) => {
+          {!plans.filter((p) => showArch ? !!p.archived_at : !p.archived_at).length ? <p className="text-sm text-muted-foreground">Nenhum plano cadastrado.</p> : (
+            <ul className="divide-y text-sm">{plans.filter((p) => showArch ? !!p.archived_at : !p.archived_at).map((p) => {
               const d = maintenanceDue({ ...p, interval_hours: p.interval_hours === null ? null : Number(p.interval_hours), last_done_hours: p.last_done_hours === null ? null : Number(p.last_done_hours) }, e.hour_meter === null ? null : Number(e.hour_meter), today);
               return (
                 <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <div><span className="font-medium">{p.name}</span> {d.overdue ? <Pill tone="danger">Vencido</Pill> : d.neverDone ? <Pill tone="warning">Nunca executado</Pill> : <Pill tone="success">Em dia</Pill>}
                     <div className="text-muted-foreground">{[p.interval_days && `a cada ${p.interval_days} dias`, p.interval_hours && `a cada ${formatNumber(p.interval_hours)} h`].filter(Boolean).join(" ou ")} · próxima: {[d.nextDate && formatDate(d.nextDate), d.nextHours !== null && `${formatNumber(d.nextHours)} h`].filter(Boolean).join(" / ") || "—"}</div></div>
-                  {mgr && <div className="flex gap-1"><Button size="sm" variant="ghost" onClick={() => setPlan(p)}>Editar</Button><Button size="sm" variant="ghost" onClick={() => archPlan.mutate({ row: p, archive: true, userId: me.userId })}>Remover</Button></div>}
+                  {mgr && <div className="flex gap-1"><Button size="sm" variant="ghost" onClick={() => setPlan(p)}>Editar</Button><Button size="sm" variant="ghost" onClick={() => archPlan.mutate({ row: p, archive: !p.archived_at, userId: me.userId })}>{p.archived_at ? "Restaurar" : "Arquivar"}</Button></div>}
                 </li>
               );
             })}</ul>

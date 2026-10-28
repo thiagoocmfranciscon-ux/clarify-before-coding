@@ -23,7 +23,7 @@ function Page() {
   const techs = useQuery({ queryKey: ["techs-min"], queryFn: async () => (await supabase.from("technicians").select("id, name").is("archived_at", null).order("name")).data ?? [] });
   const list = useQuery({
     queryKey: ["vehicles", archived], enabled: PERM.fleet(me.role) || me.role === "tecnico",
-    queryFn: async () => { const { data, error } = await supabase.from("vehicles").select("*, technicians(name)").order("plate"); const s2 = archived ? s.not("archived_at", "is", null) : s.is("archived_at", null); const { data: d2, error: e2 } = await s2; if (e2) throw e2; return d2; const _x = { data, error }; if (error) throw error; return data; },
+    queryFn: async () => { let s = supabase.from("vehicles").select("*, technicians(name)").order("plate"); s = archived ? s.not("archived_at", "is", null) : s.is("archived_at", null); const { data, error } = await s; if (error) throw error; return data; },
   });
   if (!PERM.fleet(me.role) && me.role !== "tecnico") return <NoPermission />;
   const today = spDate(); const soon = addDays(today, 30);

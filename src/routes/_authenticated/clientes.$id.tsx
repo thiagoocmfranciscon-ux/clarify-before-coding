@@ -5,7 +5,8 @@ import { MessageCircle, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, EmptyState, ErrorState, LoadingRows, PageHeader } from "@/components/kit";
 import { GenericStatus } from "@/components/status";
-import { CrudDialog, Table, td, phoneParse, useArchive, type FieldDef } from "@/components/crud";
+import { ArchivedToggle, CrudDialog, Table, td, phoneParse, useArchive, type FieldDef }
+import { WhatsAppIcon, waLink } from "@/components/icons"; from "@/components/crud";
 import { Button } from "@/components/ui/button";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
@@ -33,6 +34,7 @@ function Page() {
   });
   const arch = useArchive("customers", [["customer", id], ["customers"]]);
   const archC = useArchive("customer_contacts", [["customer", id]]);
+  const [showArch, setShowArch] = useState(false);
   if (q.isPending) return <LoadingRows />;
   if (q.isError) return <ErrorState error={q.error} onRetry={() => q.refetch()} />;
   const c = q.data;
@@ -54,16 +56,16 @@ function Page() {
           </dl>
         </Card>
         <Card className="lg:col-span-2">
-          <div className="mb-2 flex items-center justify-between"><h2 className="font-semibold">Contatos</h2>{mgr && <Button size="sm" variant="outline" onClick={() => setContact(null)}><Plus className="mr-1 h-4 w-4" />Contato</Button>}</div>
-          {!c.customer_contacts.filter((x) => !x.archived_at).length ? <p className="text-sm text-muted-foreground">Nenhum contato.</p> : (
+          <div className="mb-2 flex items-center justify-between"><h2 className="font-semibold">Contatos</h2><div className="flex gap-2"><ArchivedToggle value={showArch} onChange={setShowArch} />{mgr && <Button size="sm" variant="outline" onClick={() => setContact(null)}><Plus className="mr-1 h-4 w-4" />Contato</Button>}</div></div>
+          {!c.customer_contacts.filter((x) => showArch ? !!x.archived_at : !x.archived_at).length ? <p className="text-sm text-muted-foreground">Nenhum contato.</p> : (
             <ul className="divide-y text-sm">
-              {c.customer_contacts.filter((x) => !x.archived_at).map((ct) => (
-                <li key={ct.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+              {c.customer_contacts.filter((x) => showArch ? !!x.archived_at : !x.archived_at).map((ct) => (
+                <li key={ct.id} className={`flex flex-wrap items-center justify-between gap-2 py-2 ${ct.archived_at ? "opacity-60" : ""}`}>
                   <div><span className="font-medium">{ct.name}</span> {ct.role && <span className="text-muted-foreground">· {ct.role}</span>}<div className="text-muted-foreground">{[ct.phone, ct.email].filter(Boolean).join(" · ")}</div></div>
                   <div className="flex gap-1">
-                    {ct.phone && <Button asChild size="sm" variant="outline"><a href={`https://wa.me/55${ct.phone}`} target="_blank" rel="noreferrer"><MessageCircle className="mr-1 h-4 w-4" />WhatsApp</a></Button>}
+                    {waLink(ct.phone) && <Button asChild size="sm" className="w-9 px-0" aria-label={`WhatsApp de ${ct.name}`}><a href={waLink(ct.phone)!} target="_blank" rel="noreferrer"><WhatsAppIcon /></a></Button>}
                     {mgr && <Button size="sm" variant="ghost" onClick={() => setContact(ct)}>Editar</Button>}
-                    {mgr && <Button size="sm" variant="ghost" onClick={() => archC.mutate({ row: ct, archive: true, userId: me.userId })}>Remover</Button>}
+                    {mgr && <Button size="sm" variant="ghost" onClick={() => archC.mutate({ row: ct, archive: !ct.archived_at, userId: me.userId })}>{ct.archived_at ? "Restaurar" : "Arquivar"}</Button>}
                   </div>
                 </li>
               ))}
