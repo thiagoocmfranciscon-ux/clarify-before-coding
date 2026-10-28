@@ -11,6 +11,7 @@ export type Membership = {
   fullName: string | null;
   avatarPath: string | null;
   technicianId: string | null;
+  mustChangePassword: boolean;
 };
 
 export async function fetchMembership(): Promise<Membership | null> {
@@ -26,7 +27,7 @@ export async function fetchMembership(): Promise<Membership | null> {
   }
   if (!m) return null;
   const [{ data: p }, { data: t }] = await Promise.all([
-    supabase.from("profiles").select("full_name, avatar_path").eq("id", u.user.id).maybeSingle(),
+    supabase.from("profiles").select("full_name, avatar_path, must_change_password").eq("id", u.user.id).maybeSingle(),
     supabase.from("technicians").select("id").eq("user_id", u.user.id).is("archived_at", null).maybeSingle(),
   ]);
   return {
@@ -38,6 +39,7 @@ export async function fetchMembership(): Promise<Membership | null> {
     fullName: p?.full_name ?? null,
     avatarPath: p?.avatar_path ?? null,
     technicianId: t?.id ?? null,
+    mustChangePassword: !!p?.must_change_password,
   };
 }
 

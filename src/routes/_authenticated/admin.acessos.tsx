@@ -26,7 +26,7 @@ function Page() {
   const [email, setEmail] = useState(""); const [role, setRole] = useState<AppRole>("tecnico");
   const q = useQuery({ queryKey: ["members"], enabled: PERM.admin(me.role), queryFn: () => list() });
   const done = (msg: string) => { toast.success(msg); qc.invalidateQueries({ queryKey: ["members"] }); };
-  const inv = useMutation({ mutationFn: () => invite({ data: { email, role, redirectTo: window.location.origin } }), onSuccess: (r) => { setEmail(""); done(r.existingUser ? "Convite registrado. O usuário já tem conta: ao entrar, o acesso é liberado." : "Convite enviado por e-mail"); }, onError: (e) => toast.error(friendlyError(e)) });
+  const inv = useMutation({ mutationFn: () => invite({ data: { email, role, redirectTo: window.location.origin } }), onSuccess: (r) => { setEmail(""); done(r.existingUser ? "Convite registrado. O usuário já tem conta: ao entrar, o acesso é liberado." : r.emailSent ? "Convite enviado por e-mail" : "Convite registrado"); if (r.link) { navigator.clipboard?.writeText(r.link).catch(() => {}); toast.info("Link de acesso copiado. Envie pelo WhatsApp se o e-mail não chegar.", { duration: 8000 }); } }, onError: (e) => toast.error(friendlyError(e)) });
   const upd = useMutation({ mutationFn: (d: { memberId: string; role?: AppRole; active?: boolean }) => update({ data: d }), onSuccess: () => done("Acesso atualizado"), onError: (e) => toast.error(friendlyError(e)) });
   const rev = useMutation({ mutationFn: (id: string) => revoke({ data: { id } }), onSuccess: () => done("Convite revogado"), onError: (e) => toast.error(friendlyError(e)) });
   if (!PERM.admin(me.role)) return <NoPermission />;

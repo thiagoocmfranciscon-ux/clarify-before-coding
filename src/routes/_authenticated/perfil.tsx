@@ -32,7 +32,7 @@ function Page() {
     if (pw.length < 8) { toast.error("A senha deve ter ao menos 8 caracteres"); return; }
     if (pw !== pw2) { toast.error("As senhas não coincidem"); return; }
     setBusy(true); const { error } = await supabase.auth.updateUser({ password: pw }); setBusy(false);
-    if (error) toast.error(friendlyError(error)); else { toast.success("Senha alterada"); setPw(""); setPw2(""); }
+    if (error) toast.error(friendlyError(error)); else { await supabase.from("profiles").update({ must_change_password: false }).eq("id", me.userId); toast.success("Senha alterada"); setPw(""); setPw2(""); qc.invalidateQueries({ queryKey: ["membership"] }); }
   }
   async function upload(file: File) {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) { toast.error("Use JPG, PNG ou WebP de até 5 MB"); return; }
