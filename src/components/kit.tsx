@@ -91,7 +91,7 @@ export function HelpTip({ text }: { text: string }) {
   );
 }
 
-export function Field({ id, label, error, hint, children, required }: { id: string; label: string; error?: string; hint?: string; children: ReactNode; required?: boolean }) {
+export function Field({ id, label, error, hint, children, required }: { id: string; label: string; error?: string | undefined; hint?: string | undefined; children: ReactNode; required?: boolean }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}{required && <span className="text-destructive" aria-hidden> *</span>}</Label>
@@ -144,7 +144,7 @@ export function ConfirmDialog({ open, onOpenChange, title, description, confirmL
   );
 }
 
-export function Stat({ label, value, help, tone }: { label: string; value: ReactNode; help?: string; tone?: "danger" | "warning" }) {
+export function Stat({ label, value, help, tone }: { label: string; value: ReactNode; help?: string; tone?: "danger" | "warning" | undefined }) {
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center gap-1 text-sm text-muted-foreground">{label}{help && <HelpTip text={help} />}</div>
