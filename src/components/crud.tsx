@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Archive } from "lucide-react";
 import { Field, selectClass, textareaClass } from "@/components/kit";
 import { friendlyError } from "@/lib/errors";
 import { parseDecimal } from "@/lib/format";
@@ -96,7 +97,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
 /** Arquiva/restaura (soft delete) com versão. */
 export function useArchive(table: string, invalidate: unknown[][]) {
   const qc = useQueryClient();
-  return useMutation({
+  const m = useMutation({
     mutationFn: async ({ row, archive, userId }: { row: Row; archive: boolean; userId: string }) => {
       const { data, error } = await supabase.from(table as "customers")
         .update({ archived_at: archive ? new Date().toISOString() : null, archived_by: archive ? userId : null } as never)
@@ -107,6 +108,19 @@ export function useArchive(table: string, invalidate: unknown[][]) {
     onSuccess: (_d, v) => { invalidate.forEach((k) => qc.invalidateQueries({ queryKey: k })); toast.success(v.archive ? "Arquivado" : "Restaurado"); },
     onError: (e) => toast.error(friendlyError(e)),
   });
+  return { ...m, mutate: (v: { row: Row; archive: boolean; userId: string }) => {
+    if (v.archive && typeof window !== "undefined" && !window.confirm("Arquivar este item? Ele pode ser restaurado depois em “Exibir arquivados”.")) return;
+    m.mutate(v);
+  } };
+}
+
+/** Botão liga/desliga "Exibir arquivados". */
+export function ArchivedToggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <Button type="button" variant={value ? "secondary" : "outline"} className="min-h-11" aria-pressed={value} onClick={() => onChange(!value)}>
+      <Archive className="mr-1 h-4 w-4" />{value ? "Ocultar arquivados" : "Exibir arquivados"}
+    </Button>
+  );
 }
 
 export function Table({ head, children }: { head: string[]; children: React.ReactNode }) {

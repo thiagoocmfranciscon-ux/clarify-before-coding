@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, ErrorState, Field, LoadingRows, NoPermission, PageHeader, Pill, selectClass } from "@/components/kit";
 import { GenericStatus, StockBadge } from "@/components/status";
-import { CrudDialog, Table, td, docParse, useArchive, type FieldDef } from "@/components/crud";
+import { ArchivedToggle, CrudDialog, Table, td, docParse, useArchive, type FieldDef } from "@/components/crud";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -61,9 +61,10 @@ function Parts() {
   const [q, setQ] = useState(""); const [alert, setAlert] = useState(sp.alert ?? "");
   const [row, setRow] = useState<Record<string, unknown> | null | undefined>(undefined);
   const [move, setMove] = useState<{ id: string; code: string; allowsFraction: boolean } | null>(null);
+  const [archived, setArchived] = useState(false);
   const list = useQuery({
-    queryKey: ["parts"],
-    queryFn: async () => { const { data, error } = await supabase.from("parts").select("*, units(code, allows_fraction), part_categories(name), suppliers(name), stock_balances(qty, avg_cost, last_cost)").is("archived_at", null).order("code"); if (error) throw error; return data; },
+    queryKey: ["parts", archived],
+    queryFn: async () => { let s = supabase.from("parts").select("*, units(code, allows_fraction), part_categories(name), suppliers(name), stock_balances(qty, avg_cost, last_cost)").order("code"); s = archived ? s.not("archived_at", "is", null) : s.is("archived_at", null); const { data, error } = await s; if (error) throw error; return data; },
   });
   const arch = useArchive("parts", [["parts"]]);
   const fields: FieldDef[] = [
@@ -83,20 +84,21 @@ function Parts() {
       <div className="mb-3 flex flex-wrap gap-2">
         <Input className="h-11 max-w-xs" placeholder="Buscar código ou descrição" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar peça" />
         <select className={`${selectClass} max-w-48`} value={alert} onChange={(e) => setAlert(e.target.value)} aria-label="Alerta"><option value="">Todos</option><option value="sem_estoque">Sem estoque</option><option value="baixo">Baixo</option><option value="critico">Sem estoque ou baixo</option><option value="normal">Normal</option></select>
+        <ArchivedToggle value={archived} onChange={setArchived} />
         {can && <Button className="ml-auto min-h-11" onClick={() => setRow(null)} disabled={!lk.data?.cats.length || !lk.data?.units.length}><Plus className="mr-1 h-4 w-4" />Nova peça</Button>}
       </div>
       {can && lk.data && (!lk.data.cats.length || !lk.data.units.length) && <p className="mb-3 text-sm text-warning-foreground">Cadastre ao menos uma categoria e uma unidade na aba “Categorias e unidades”.</p>}
       {list.isPending ? <LoadingRows /> : list.isError ? <ErrorState error={list.error} /> : !rows.length ? <EmptyState title="Nenhuma peça" /> : (
         <Table head={["Código", "Descrição", "Saldo", "Mínimo", "Custo médio", "Alerta", ""]}>
           {rows.map((p) => (
-            <tr key={p.id}>
-              <td className={`${td} font-medium`}>{p.code}</td><td className={td}>{p.description}<div className="text-xs text-muted-foreground">{p.part_categories?.name} · {p.location ?? "sem local"}</div></td>
+            <tr key={p.id} className={p.archived_at ? "opacity-60" : ""}>
+              <td className={`${td} font-medium`}>{p.code}{p.archived_at && <div className="text-xs text-muted-foreground">Arquivada</div>}</td><td className={td}>{p.description}<div className="text-xs text-muted-foreground">{p.part_categories?.name} · {p.location ?? "sem local"}</div></td>
               <td className={`${td} tabular-nums`}>{formatNumber(p.qty)} {p.units?.code}</td><td className={td}>{formatNumber(p.min_qty)}</td>
               <td className={td}>{PERM.seeCosts(me.role) || can ? formatBRL(p.avg) : "—"}</td><td className={td}><StockBadge alert={p.alert} /></td>
               <td className={`${td} whitespace-nowrap text-right`}>{can && <>
                 <Button size="sm" variant="outline" onClick={() => setMove({ id: p.id, code: p.code, allowsFraction: !!p.units?.allows_fraction })}>Movimentar</Button>
                 <Button size="sm" variant="ghost" onClick={() => setRow(p)}>Editar</Button>
-                <Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: p, archive: true, userId: me.userId })}>Arquivar</Button></>}</td>
+                <Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: p, archive: !p.archived_at, userId: me.userId })}>{p.archived_at ? "Restaurar" : "Arquivar"}</Button></>}</td>
             </tr>
           ))}
         </Table>
@@ -212,16 +214,16 @@ function Requests() {
 }
 
 function Suppliers() {
-  const me = useMe(); const [row, setRow] = useState<Record<string, unknown> | null | undefined>(undefined);
-  const list = useQuery({ queryKey: ["suppliers"], queryFn: async () => (await supabase.from("suppliers").select("*").is("archived_at", null).order("name")).data ?? [] });
+  const me = useMe(); const [row, setRow] = useState<Record<string, unknown> | null | undefined>(undefined); const [archived, setArchived] = useState(false);
+  const list = useQuery({ queryKey: ["suppliers", archived], queryFn: async () => { const s = supabase.from("suppliers").select("*").order("name"); return (await (archived ? s.not("archived_at", "is", null) : s.is("archived_at", null))).data ?? []; } });
   const arch = useArchive("suppliers", [["suppliers"], ["stock-lookups"]]);
   const fields: FieldDef[] = [{ key: "name", label: "Nome", required: true }, { key: "document", label: "CPF/CNPJ", parse: docParse }, { key: "contact", label: "Contato" }];
   return (
     <>
-      {PERM.stock(me.role) && <Button className="mb-3 min-h-11" onClick={() => setRow(null)}><Plus className="mr-1 h-4 w-4" />Novo fornecedor</Button>}
+      <div className="mb-3 flex flex-wrap gap-2">{PERM.stock(me.role) && <Button className="min-h-11" onClick={() => setRow(null)}><Plus className="mr-1 h-4 w-4" />Novo fornecedor</Button>}<ArchivedToggle value={archived} onChange={setArchived} /></div>
       {!list.data?.length ? <EmptyState title="Nenhum fornecedor" /> : (
-        <Table head={["Nome", "Documento", "Contato", ""]}>{list.data.map((s) => <tr key={s.id}><td className={`${td} font-medium`}>{s.name}</td><td className={td}>{s.document ?? "—"}</td><td className={td}>{s.contact ?? "—"}</td>
-          <td className={`${td} text-right`}>{PERM.stock(me.role) && <><Button size="sm" variant="ghost" onClick={() => setRow(s)}>Editar</Button><Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: s, archive: true, userId: me.userId })}>Arquivar</Button></>}</td></tr>)}</Table>
+        <Table head={["Nome", "Documento", "Contato", ""]}>{list.data.map((s) => <tr key={s.id} className={s.archived_at ? "opacity-60" : ""}><td className={`${td} font-medium`}>{s.name}</td><td className={td}>{s.document ?? "—"}</td><td className={td}>{s.contact ?? "—"}</td>
+          <td className={`${td} text-right`}>{PERM.stock(me.role) && <><Button size="sm" variant="ghost" onClick={() => setRow(s)}>Editar</Button><Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: s, archive: !s.archived_at, userId: me.userId })}>{s.archived_at ? "Restaurar" : "Arquivar"}</Button></>}</td></tr>)}</Table>
       )}
       <CrudDialog open={row !== undefined} onOpenChange={(o) => !o && setRow(undefined)} table="suppliers" title="fornecedor" fields={fields} row={row} invalidate={[["suppliers"], ["stock-lookups"]]} />
     </>
