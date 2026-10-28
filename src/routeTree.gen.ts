@@ -13,8 +13,21 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedTecnicosRouteImport } from './routes/_authenticated/tecnicos'
+import { Route as AuthenticatedAdminAcessosRouteImport } from './routes/_authenticated/admin.acessos'
+import { Route as AuthenticatedClientesIndexRouteImport } from './routes/_authenticated/clientes.index'
+import { Route as AuthenticatedClientesIdRouteImport } from './routes/_authenticated/clientes.$id'
+import { Route as AuthenticatedEquipamentosIndexRouteImport } from './routes/_authenticated/equipamentos.index'
+import { Route as AuthenticatedEquipamentosIdRouteImport } from './routes/_authenticated/equipamentos.$id'
+import { Route as AuthenticatedFrotasIndexRouteImport } from './routes/_authenticated/frotas.index'
+import { Route as AuthenticatedFrotasIdRouteImport } from './routes/_authenticated/frotas.$id'
 import { Route as AuthenticatedOsIndexRouteImport } from './routes/_authenticated/os.index'
+import { Route as AuthenticatedOsIdRouteImport } from './routes/_authenticated/os.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +48,74 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEstoqueRoute = AuthenticatedEstoqueRouteImport.update({
+  id: '/estoque',
+  path: '/estoque',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTecnicosRoute = AuthenticatedTecnicosRouteImport.update({
+  id: '/tecnicos',
+  path: '/tecnicos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminAcessosRoute =
+  AuthenticatedAdminAcessosRouteImport.update({
+    id: '/admin/acessos',
+    path: '/admin/acessos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientesIndexRoute =
+  AuthenticatedClientesIndexRouteImport.update({
+    id: '/clientes/',
+    path: '/clientes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientesIdRoute = AuthenticatedClientesIdRouteImport.update({
+  id: '/clientes/$id',
+  path: '/clientes/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEquipamentosIndexRoute =
+  AuthenticatedEquipamentosIndexRouteImport.update({
+    id: '/equipamentos/',
+    path: '/equipamentos/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEquipamentosIdRoute =
+  AuthenticatedEquipamentosIdRouteImport.update({
+    id: '/equipamentos/$id',
+    path: '/equipamentos/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFrotasIndexRoute =
+  AuthenticatedFrotasIndexRouteImport.update({
+    id: '/frotas/',
+    path: '/frotas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFrotasIdRoute = AuthenticatedFrotasIdRouteImport.update({
+  id: '/frotas/$id',
+  path: '/frotas/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOsIndexRoute = AuthenticatedOsIndexRouteImport.update({
@@ -45,19 +123,50 @@ const AuthenticatedOsIndexRoute = AuthenticatedOsIndexRouteImport.update({
   path: '/os/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOsIdRoute = AuthenticatedOsIdRouteImport.update({
+  id: '/os/$id',
+  path: '/os/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/estoque': typeof AuthenticatedEstoqueRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/admin/acessos': typeof AuthenticatedAdminAcessosRoute
+  '/clientes/$id': typeof AuthenticatedClientesIdRoute
+  '/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
+  '/frotas/$id': typeof AuthenticatedFrotasIdRoute
+  '/os/$id': typeof AuthenticatedOsIdRoute
+  '/clientes/': typeof AuthenticatedClientesIndexRoute
+  '/equipamentos/': typeof AuthenticatedEquipamentosIndexRoute
+  '/frotas/': typeof AuthenticatedFrotasIndexRoute
   '/os/': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/estoque': typeof AuthenticatedEstoqueRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/admin/acessos': typeof AuthenticatedAdminAcessosRoute
+  '/clientes/$id': typeof AuthenticatedClientesIdRoute
+  '/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
+  '/frotas/$id': typeof AuthenticatedFrotasIdRoute
+  '/os/$id': typeof AuthenticatedOsIdRoute
+  '/clientes': typeof AuthenticatedClientesIndexRoute
+  '/equipamentos': typeof AuthenticatedEquipamentosIndexRoute
+  '/frotas': typeof AuthenticatedFrotasIndexRoute
   '/os': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRoutesById {
@@ -66,21 +175,83 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/_authenticated/admin/acessos': typeof AuthenticatedAdminAcessosRoute
+  '/_authenticated/clientes/$id': typeof AuthenticatedClientesIdRoute
+  '/_authenticated/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
+  '/_authenticated/frotas/$id': typeof AuthenticatedFrotasIdRoute
+  '/_authenticated/os/$id': typeof AuthenticatedOsIdRoute
+  '/_authenticated/clientes/': typeof AuthenticatedClientesIndexRoute
+  '/_authenticated/equipamentos/': typeof AuthenticatedEquipamentosIndexRoute
+  '/_authenticated/frotas/': typeof AuthenticatedFrotasIndexRoute
   '/_authenticated/os/': typeof AuthenticatedOsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/dashboard' | '/os/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/auditoria'
+    | '/dashboard'
+    | '/estoque'
+    | '/perfil'
+    | '/relatorios'
+    | '/tecnicos'
+    | '/admin/acessos'
+    | '/clientes/$id'
+    | '/equipamentos/$id'
+    | '/frotas/$id'
+    | '/os/$id'
+    | '/clientes/'
+    | '/equipamentos/'
+    | '/frotas/'
+    | '/os/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard' | '/os'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/auditoria'
+    | '/dashboard'
+    | '/estoque'
+    | '/perfil'
+    | '/relatorios'
+    | '/tecnicos'
+    | '/admin/acessos'
+    | '/clientes/$id'
+    | '/equipamentos/$id'
+    | '/frotas/$id'
+    | '/os/$id'
+    | '/clientes'
+    | '/equipamentos'
+    | '/frotas'
+    | '/os'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/auditoria'
     | '/_authenticated/dashboard'
+    | '/_authenticated/estoque'
+    | '/_authenticated/perfil'
+    | '/_authenticated/relatorios'
+    | '/_authenticated/tecnicos'
+    | '/_authenticated/admin/acessos'
+    | '/_authenticated/clientes/$id'
+    | '/_authenticated/equipamentos/$id'
+    | '/_authenticated/frotas/$id'
+    | '/_authenticated/os/$id'
+    | '/_authenticated/clientes/'
+    | '/_authenticated/equipamentos/'
+    | '/_authenticated/frotas/'
     | '/_authenticated/os/'
   fileRoutesById: FileRoutesById
 }
@@ -121,11 +292,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/auditoria': {
+      id: '/_authenticated/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/estoque': {
+      id: '/_authenticated/estoque'
+      path: '/estoque'
+      fullPath: '/estoque'
+      preLoaderRoute: typeof AuthenticatedEstoqueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/relatorios': {
+      id: '/_authenticated/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tecnicos': {
+      id: '/_authenticated/tecnicos'
+      path: '/tecnicos'
+      fullPath: '/tecnicos'
+      preLoaderRoute: typeof AuthenticatedTecnicosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/acessos': {
+      id: '/_authenticated/admin/acessos'
+      path: '/admin/acessos'
+      fullPath: '/admin/acessos'
+      preLoaderRoute: typeof AuthenticatedAdminAcessosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clientes/': {
+      id: '/_authenticated/clientes/'
+      path: '/clientes'
+      fullPath: '/clientes/'
+      preLoaderRoute: typeof AuthenticatedClientesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clientes/$id': {
+      id: '/_authenticated/clientes/$id'
+      path: '/clientes/$id'
+      fullPath: '/clientes/$id'
+      preLoaderRoute: typeof AuthenticatedClientesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipamentos/': {
+      id: '/_authenticated/equipamentos/'
+      path: '/equipamentos'
+      fullPath: '/equipamentos/'
+      preLoaderRoute: typeof AuthenticatedEquipamentosIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipamentos/$id': {
+      id: '/_authenticated/equipamentos/$id'
+      path: '/equipamentos/$id'
+      fullPath: '/equipamentos/$id'
+      preLoaderRoute: typeof AuthenticatedEquipamentosIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/frotas/': {
+      id: '/_authenticated/frotas/'
+      path: '/frotas'
+      fullPath: '/frotas/'
+      preLoaderRoute: typeof AuthenticatedFrotasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/frotas/$id': {
+      id: '/_authenticated/frotas/$id'
+      path: '/frotas/$id'
+      fullPath: '/frotas/$id'
+      preLoaderRoute: typeof AuthenticatedFrotasIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/os/': {
@@ -135,16 +390,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/os/$id': {
+      id: '/_authenticated/os/$id'
+      path: '/os/$id'
+      fullPath: '/os/$id'
+      preLoaderRoute: typeof AuthenticatedOsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedTecnicosRoute: typeof AuthenticatedTecnicosRoute
+  AuthenticatedAdminAcessosRoute: typeof AuthenticatedAdminAcessosRoute
+  AuthenticatedClientesIdRoute: typeof AuthenticatedClientesIdRoute
+  AuthenticatedEquipamentosIdRoute: typeof AuthenticatedEquipamentosIdRoute
+  AuthenticatedFrotasIdRoute: typeof AuthenticatedFrotasIdRoute
+  AuthenticatedOsIdRoute: typeof AuthenticatedOsIdRoute
+  AuthenticatedClientesIndexRoute: typeof AuthenticatedClientesIndexRoute
+  AuthenticatedEquipamentosIndexRoute: typeof AuthenticatedEquipamentosIndexRoute
+  AuthenticatedFrotasIndexRoute: typeof AuthenticatedFrotasIndexRoute
   AuthenticatedOsIndexRoute: typeof AuthenticatedOsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedTecnicosRoute: AuthenticatedTecnicosRoute,
+  AuthenticatedAdminAcessosRoute: AuthenticatedAdminAcessosRoute,
+  AuthenticatedClientesIdRoute: AuthenticatedClientesIdRoute,
+  AuthenticatedEquipamentosIdRoute: AuthenticatedEquipamentosIdRoute,
+  AuthenticatedFrotasIdRoute: AuthenticatedFrotasIdRoute,
+  AuthenticatedOsIdRoute: AuthenticatedOsIdRoute,
+  AuthenticatedClientesIndexRoute: AuthenticatedClientesIndexRoute,
+  AuthenticatedEquipamentosIndexRoute: AuthenticatedEquipamentosIndexRoute,
+  AuthenticatedFrotasIndexRoute: AuthenticatedFrotasIndexRoute,
   AuthenticatedOsIndexRoute: AuthenticatedOsIndexRoute,
 }
 
