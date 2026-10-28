@@ -92,7 +92,7 @@ export const createAvatarUpload = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: org } = await context.supabase.rpc("my_org");
     if (!org) throw new Error("Sem associação ativa");
-    const path = `${org}/profile/${context.userId}/${crypto.randomUUID()}.${data.mime.split("/")[1].replace("jpeg", "jpg")}`;
+    const path = `${org}/profile/${context.userId}/${crypto.randomUUID()}.${(data.mime.split("/")[1] ?? "jpg").replace("jpeg", "jpg")}`;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: up, error } = await supabaseAdmin.storage.from("attachments").createSignedUploadUrl(path);
     if (error || !up) throw new Error("Falha ao preparar upload");
