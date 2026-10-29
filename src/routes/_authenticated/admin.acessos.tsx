@@ -34,16 +34,19 @@ function Page() {
   const [confirm, setConfirm] = useState<{ id: string; archive: boolean } | null>(null);
   const q = useQuery({ queryKey: ["members"], enabled: PERM.admin(me.role), queryFn: () => list() });
   const done = (msg: string) => { toast.success(msg); qc.invalidateQueries({ queryKey: ["members"] }); };
+  const copyLink = (link: string, msg: string) => {
+    navigator.clipboard?.writeText(link).then(() => toast.success(msg, { description: "Cole no e-mail, WhatsApp ou SMS da pessoa.", duration: 8000 })).catch(() => toast.info(link, { duration: 20000 }));
+  };
   const inv = useMutation({
     mutationFn: () => invite({ data: { email, role, channel, phone, fullName } }),
     onSuccess: (r) => {
       if (channel === "whatsapp") {
-        const url = r.link ? waLink(phone, waText(fullName, r.link)) : null;
-        if (url) window.open(url, "_blank", "noopener"); else toast.error("Não foi possível gerar o link de acesso.");
+        const url = waLink(phone, waText(fullName, r.link));
+        if (url) window.open(url, "_blank", "noopener");
         done("Convite criado. Envie a mensagem no WhatsApp.");
       } else {
-        done(r.existingUser ? "Convite registrado. O usuário já tem conta: ao entrar, o acesso é liberado." : r.emailSent ? "Convite enviado por e-mail" : "Convite registrado");
-        if (r.link) { navigator.clipboard?.writeText(r.link).catch(() => {}); toast.info("Link de acesso copiado. Envie pelo WhatsApp se o e-mail não chegar.", { duration: 8000 }); }
+        done("Convite criado");
+        copyLink(r.link, "Link do convite copiado");
       }
       setEmail(""); setPhone(""); setFullName("");
     },
@@ -52,14 +55,15 @@ function Page() {
   const rs = useMutation({
     mutationFn: (v: { id: string; via: "copy" | "whatsapp" }) => resend({ data: { id: v.id } }).then((r) => ({ ...r, via: v.via })),
     onSuccess: (r) => {
-      if (!r.link) { toast.error("Não foi possível gerar o link."); return; }
+      qc.invalidateQueries({ queryKey: ["members"] });
       if (r.via === "whatsapp") { const url = waLink(r.phone, waText(r.fullName, r.link)); if (url) window.open(url, "_blank", "noopener"); }
-      else { navigator.clipboard?.writeText(r.link).then(() => toast.success("Link de acesso copiado")).catch(() => toast.info(r.link!)); }
+      else copyLink(r.link, "Novo link copiado. O link anterior deixou de funcionar.");
     },
     onError: (e) => toast.error(friendlyError(e)),
   });
   const upd = useMutation({ mutationFn: (d: { memberId: string; role?: AppRole; active?: boolean; archive?: boolean }) => update({ data: d }), onSuccess: (_r, d) => done(d.archive === true ? "Usuário arquivado" : d.archive === false ? "Usuário restaurado. Reative o acesso quando quiser." : "Acesso atualizado"), onError: (e) => toast.error(friendlyError(e)) });
-  const rev = useMutation({ mutationFn: (id: string) => revoke({ data: { id } }), onSuccess: () => done("Convite revogado"), onError: (e) => toast.error(friendlyError(e)) });
+  const del = useMutation({ mutationFn: (id: string) => remove({ data: { id } }), onSuccess: () => done("Convite excluído"), onError: (e) => toast.error(friendlyError(e)) });
+  const [delId, setDelId] = useState<string | null>(null);
   if (!PERM.admin(me.role)) return <NoPermission />;
   const now = new Date().toISOString();
   return (
