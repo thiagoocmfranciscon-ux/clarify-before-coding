@@ -12,6 +12,9 @@ import { PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
 import { inviteUser, listMembers, revokeInvitation, updateMember } from "@/lib/admin.functions";
+import { memberStatus } from "@/lib/domain";
+import { Archive, ArrowLeft } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/acessos")({
   head: () => ({ meta: [{ title: "Administração de Acessos — Empilha Nobre" }, { name: "description", content: "Convites, papéis e revogação de acesso." }, { property: "og:title", content: "Administração de Acessos — Empilha Nobre" }, { property: "og:description", content: "Convites e papéis." }] }),
@@ -24,10 +27,12 @@ function Page() {
   const me = useMe(); const qc = useQueryClient();
   const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const revoke = useServerFn(revokeInvitation); const update = useServerFn(updateMember);
   const [email, setEmail] = useState(""); const [role, setRole] = useState<AppRole>("tecnico");
+  const [showArchived, setShowArchived] = useState(false);
+  const [confirm, setConfirm] = useState<{ id: string; archive: boolean } | null>(null);
   const q = useQuery({ queryKey: ["members"], enabled: PERM.admin(me.role), queryFn: () => list() });
   const done = (msg: string) => { toast.success(msg); qc.invalidateQueries({ queryKey: ["members"] }); };
   const inv = useMutation({ mutationFn: () => invite({ data: { email, role, redirectTo: window.location.origin } }), onSuccess: (r) => { setEmail(""); done(r.existingUser ? "Convite registrado. O usuário já tem conta: ao entrar, o acesso é liberado." : r.emailSent ? "Convite enviado por e-mail" : "Convite registrado"); if (r.link) { navigator.clipboard?.writeText(r.link).catch(() => {}); toast.info("Link de acesso copiado. Envie pelo WhatsApp se o e-mail não chegar.", { duration: 8000 }); } }, onError: (e) => toast.error(friendlyError(e)) });
-  const upd = useMutation({ mutationFn: (d: { memberId: string; role?: AppRole; active?: boolean }) => update({ data: d }), onSuccess: () => done("Acesso atualizado"), onError: (e) => toast.error(friendlyError(e)) });
+  const upd = useMutation({ mutationFn: (d: { memberId: string; role?: AppRole; active?: boolean; archive?: boolean }) => update({ data: d }), onSuccess: (_r, d) => done(d.archive === true ? "Usuário arquivado" : d.archive === false ? "Usuário restaurado. Reative o acesso quando quiser." : "Acesso atualizado"), onError: (e) => toast.error(friendlyError(e)) });
   const rev = useMutation({ mutationFn: (id: string) => revoke({ data: { id } }), onSuccess: () => done("Convite revogado"), onError: (e) => toast.error(friendlyError(e)) });
   if (!PERM.admin(me.role)) return <NoPermission />;
   const now = new Date().toISOString();
@@ -44,17 +49,64 @@ function Page() {
       </Card>
       {q.isPending ? <LoadingRows /> : q.isError ? <ErrorState error={q.error} onRetry={() => q.refetch()} /> : (
         <>
-          <h2 className="mb-2 text-lg font-semibold">Usuários</h2>
-          <Table head={["Nome", "E-mail", "Papel", "Situação", ""]}>
-            {q.data.members.map((m) => (
-              <tr key={m.id}>
-                <td className={td}>{m.full_name ?? "—"}</td><td className={td}>{m.email}</td>
-                <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
-                <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>
-                <td className={td}>{m.user_id !== me.userId && <Button size="sm" variant="outline" onClick={() => upd.mutate({ memberId: m.id, active: !m.active })}>{m.active ? "Revogar acesso" : "Reativar"}</Button>}</td>
-              </tr>
-            ))}
-          </Table>
+          {(() => {
+            const archived = q.data.members.filter((m) => memberStatus(m) === "archived");
+            const current = q.data.members.filter((m) => memberStatus(m) !== "archived");
+            return (<>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-lg font-semibold">{showArchived ? "Usuários arquivados" : "Usuários"}</h2>
+                <Button variant="outline" className="min-h-10" onClick={() => setShowArchived((v) => !v)}>
+                  {showArchived ? <><ArrowLeft className="mr-1 h-4 w-4" />Voltar aos usuários</> : <><Archive className="mr-1 h-4 w-4" />Usuários arquivados ({archived.length})</>}
+                </Button>
+              </div>
+              {showArchived ? (
+                <Table head={["Nome", "E-mail", "Papel", "Arquivado em", "Situação", "Ações"]}>
+                  {archived.length === 0 && <tr><td className={td} colSpan={6}>Nenhum usuário arquivado.</td></tr>}
+                  {archived.map((m) => (
+                    <tr key={m.id}>
+                      <td className={td}>{m.full_name ?? "—"}</td><td className={td}>{m.email}</td>
+                      <td className={td}>{ROLE_LABEL[m.role as AppRole]}</td>
+                      <td className={td}>{m.archived_at ? formatDateTime(m.archived_at) : "—"}</td>
+                      <td className={td}><Pill tone="neutral">Arquivado</Pill></td>
+                      <td className={td}><Button size="sm" variant="outline" onClick={() => setConfirm({ id: m.id, archive: false })}>Restaurar</Button></td>
+                    </tr>
+                  ))}
+                </Table>
+              ) : (
+                <Table head={["Nome", "E-mail", "Papel", "Situação", ""]}>
+                  {current.map((m) => (
+                    <tr key={m.id}>
+                      <td className={td}>{m.full_name ?? "—"}</td><td className={td}>{m.email}</td>
+                      <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
+                      <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>
+                      <td className={td}>{m.user_id !== me.userId && (
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <Button size="sm" variant="outline" onClick={() => upd.mutate({ memberId: m.id, active: !m.active })}>{m.active ? "Revogar acesso" : "Reativar"}</Button>
+                          <Button size="sm" variant="outline" onClick={() => setConfirm({ id: m.id, archive: true })}><Archive className="mr-1 h-4 w-4" />Arquivar</Button>
+                        </div>
+                      )}</td>
+                    </tr>
+                  ))}
+                </Table>
+              )}
+            </>);
+          })()}
+          <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{confirm?.archive ? "Arquivar usuário?" : "Restaurar usuário?"}</AlertDialogTitle>
+                <AlertDialogDescription>{confirm?.archive
+                  ? "Este usuário não trabalha mais na empresa? Ao arquivar, ele será removido da lista de usuários ativos, mas seu histórico será preservado."
+                  : "Este usuário voltará para a lista de usuários e poderá ter seu acesso reativado."}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => { if (confirm) upd.mutate({ memberId: confirm.id, archive: confirm.archive }); setConfirm(null); }}>
+                  {confirm?.archive ? "Arquivar usuário" : "Restaurar usuário"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <h2 className="mb-2 mt-6 text-lg font-semibold">Convites</h2>
           <Table head={["E-mail", "Papel", "Enviado", "Situação", ""]}>
             {q.data.invites.map((i) => {

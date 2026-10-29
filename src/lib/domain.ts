@@ -123,3 +123,9 @@ export const PERM = {
   fleet: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "leitura" || r === "almoxarife",
   audit: (r?: AppRole | null) => r === "admin" || r === "gestor",
 };
+
+/** Situação do usuário: arquivado tem prioridade sobre ativo/revogado. */
+export function memberStatus(m: { active: boolean; archived_at?: string | null }): "active" | "revoked" | "archived" {
+  if (m.archived_at) return "archived";
+  return m.active ? "active" : "revoked";
+}

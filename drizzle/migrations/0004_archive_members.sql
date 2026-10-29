@@ -1,0 +1,1 @@
+ALTER TABLE public.organization_members ADD COLUMN IF NOT EXISTS archived_at timestamptz, ADD COLUMN IF NOT EXISTS archived_by uuid;
