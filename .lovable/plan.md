@@ -29,8 +29,8 @@ Itens de cada sub-aba:
 |---|---|
 | Setor Técnico (o antigo Administrador) | Tudo, inclusive Acessos. É o único que muda papéis e configurações. |
 | CEO | Tudo, incluindo os acessos |
-| Diretor Comercial | Tudo, menos Acessos |
-| Gestor de Manutenção | Tudo, menos Acessos |
+| Diretor Comercial | Tudo, incluindo os acessos |
+| Gestor de Manutenção | Tudo, incluindo os acessos |
 | Almoxarifado | Dashboard, OS, Estoque de peças, Frotas |
 | Técnico Interno | Dashboard, Frotas, OS, Estoque de peças |
 | Técnico Externo | Dashboard, Frotas, OS, Estoque de peças |
