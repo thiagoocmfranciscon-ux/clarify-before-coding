@@ -52,7 +52,7 @@ function Page() {
   const rs = useMutation({
     mutationFn: (v: { id: string; via: "copy" | "whatsapp" }) => resend({ data: { id: v.id } }).then((r) => ({ ...r, via: v.via })),
     onSuccess: (r) => {
-      if (!r.link) return toast.error("Não foi possível gerar o link.");
+      if (!r.link) { toast.error("Não foi possível gerar o link."); return; }
       if (r.via === "whatsapp") { const url = waLink(r.phone, waText(r.fullName, r.link)); if (url) window.open(url, "_blank", "noopener"); }
       else { navigator.clipboard?.writeText(r.link).then(() => toast.success("Link de acesso copiado")).catch(() => toast.info(r.link!)); }
     },
