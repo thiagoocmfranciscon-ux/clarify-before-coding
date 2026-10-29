@@ -68,21 +68,19 @@ function Page() {
   const now = new Date().toISOString();
   return (
     <>
-      <PageHeader title="Administração de Acessos" description="Convites individuais valem 7 dias e podem ser usados uma única vez." />
+      <PageHeader title="Administração de Acessos" description="Cada convite gera um link do site, válido por 7 dias e de uso único. A pessoa abre o link e cria a própria senha." />
       <Card className="mb-6">
         <h2 className="mb-3 font-semibold">Convidar usuário</h2>
         <div className="mb-3 inline-flex rounded-lg border p-1" role="tablist">
-          <Button type="button" size="sm" variant={channel === "email" ? "default" : "ghost"} onClick={() => setChannel("email")}><Mail className="mr-1 h-4 w-4" />Por e-mail</Button>
+          <Button type="button" size="sm" variant={channel === "email" ? "default" : "ghost"} onClick={() => setChannel("email")}><Link2 className="mr-1 h-4 w-4" />Copiar link</Button>
           <Button type="button" size="sm" variant={channel === "whatsapp" ? "default" : "ghost"} onClick={() => setChannel("whatsapp")}><WhatsAppIcon className="mr-1 h-4 w-4" />Por WhatsApp</Button>
         </div>
         <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] lg:items-end" onSubmit={(e) => { e.preventDefault(); inv.mutate(); }}>
-          {channel === "whatsapp" && <>
-            <Field id="in" label="Nome"><Input id="in" className="h-11" value={fullName} onChange={(e) => setFullName(e.target.value)} /></Field>
-            <Field id="ip" label="Telefone (com DDD)"><Input id="ip" type="tel" inputMode="tel" placeholder="(11) 98765-4321" className="h-11" value={phone} onChange={(e) => setPhone(e.target.value)} required /></Field>
-          </>}
-          <Field id="ie" label={channel === "whatsapp" ? "E-mail (usado para entrar)" : "E-mail"}><Input id="ie" type="email" className="h-11" value={email} onChange={(e) => setEmail(e.target.value)} required /></Field>
+          <Field id="in" label="Nome"><Input id="in" className="h-11" value={fullName} onChange={(e) => setFullName(e.target.value)} /></Field>
+          {channel === "whatsapp" && <Field id="ip" label="Telefone (com DDD)"><Input id="ip" type="tel" inputMode="tel" placeholder="(11) 98765-4321" className="h-11" value={phone} onChange={(e) => setPhone(e.target.value)} required /></Field>}
+          <Field id="ie" label="E-mail (usado para entrar)"><Input id="ie" type="email" className="h-11" value={email} onChange={(e) => setEmail(e.target.value)} required /></Field>
           <Field id="ir" label="Papel"><select id="ir" className={selectClass} value={role} onChange={(e) => setRole(e.target.value as AppRole)}>{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select></Field>
-          <Button type="submit" className="min-h-11" disabled={inv.isPending || !email || (channel === "whatsapp" && !phone)}>{inv.isPending ? "Enviando…" : channel === "whatsapp" ? "Convidar pelo WhatsApp" : "Convidar"}</Button>
+          <Button type="submit" className="min-h-11" disabled={inv.isPending || !email || (channel === "whatsapp" && !phone)}>{inv.isPending ? "Gerando…" : channel === "whatsapp" ? "Convidar pelo WhatsApp" : "Gerar e copiar link"}</Button>
         </form>
       </Card>
       {q.isPending ? <LoadingRows /> : q.isError ? <ErrorState error={q.error} onRetry={() => q.refetch()} /> : (
@@ -152,15 +150,29 @@ function Page() {
               return (
                 <tr key={i.id}><td className={td}>{i.full_name ? <><div className="font-medium">{i.full_name}</div><div className="text-xs text-muted-foreground">{i.email}</div></> : i.email}</td><td className={td}>{i.phone ?? "—"}</td><td className={td}>{ROLE_LABEL[i.role as AppRole]}</td><td className={td}>{formatDateTime(i.created_at)}</td>
                   <td className={td}><Pill tone={st === "Pendente" ? "warning" : st === "Usado" ? "success" : "neutral"}>{st}</Pill></td>
-                  <td className={td}>{(st === "Pendente" || st === "Expirado") && (
+                  <td className={td}>{st !== "Usado" && (
                     <div className="flex flex-wrap gap-1">
-                      <Button size="sm" variant="outline" disabled={rs.isPending} onClick={() => rs.mutate({ id: i.id, via: "copy" })}><Copy className="mr-1 h-4 w-4" />Copiar link</Button>
-                      {i.phone && <Button size="sm" variant="outline" disabled={rs.isPending} onClick={() => rs.mutate({ id: i.id, via: "whatsapp" })} aria-label="Reenviar pelo WhatsApp"><WhatsAppIcon /></Button>}
-                      {st === "Pendente" && <Button size="sm" variant="ghost" onClick={() => rev.mutate(i.id)}>Revogar</Button>}
+                      {(st === "Pendente" || st === "Expirado") && <>
+                        <Button size="sm" variant="outline" disabled={rs.isPending} onClick={() => rs.mutate({ id: i.id, via: "copy" })}><Copy className="mr-1 h-4 w-4" />Gerar novo link</Button>
+                        {i.phone && <Button size="sm" variant="outline" disabled={rs.isPending} onClick={() => rs.mutate({ id: i.id, via: "whatsapp" })} aria-label="Reenviar pelo WhatsApp"><WhatsAppIcon /></Button>}
+                      </>}
+                      <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={del.isPending} onClick={() => setDelId(i.id)} aria-label="Excluir convite"><Trash2 className="mr-1 h-4 w-4" />Excluir</Button>
                     </div>)}</td></tr>
               );
             })}
           </Table>
+          <AlertDialog open={!!delId} onOpenChange={(o) => !o && setDelId(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Excluir este convite?</AlertDialogTitle>
+                <AlertDialogDescription>O convite sai da lista e o link enviado para a pessoa deixa de funcionar na hora.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { if (delId) del.mutate(delId); setDelId(null); }}>Excluir convite</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </>
