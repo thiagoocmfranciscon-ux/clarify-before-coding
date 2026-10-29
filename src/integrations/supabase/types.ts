@@ -512,8 +512,10 @@ export type Database = {
           created_by: string | null
           email: string
           expires_at: string
+          full_name: string | null
           id: string
           organization_id: string
+          phone: string | null
           revoked_at: string | null
           role: Database["public"]["Enums"]["app_role"]
           used_at: string | null
@@ -524,8 +526,10 @@ export type Database = {
           created_by?: string | null
           email: string
           expires_at: string
+          full_name?: string | null
           id?: string
           organization_id: string
+          phone?: string | null
           revoked_at?: string | null
           role: Database["public"]["Enums"]["app_role"]
           used_at?: string | null
@@ -536,8 +540,10 @@ export type Database = {
           created_by?: string | null
           email?: string
           expires_at?: string
+          full_name?: string | null
           id?: string
           organization_id?: string
+          phone?: string | null
           revoked_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           used_at?: string | null
