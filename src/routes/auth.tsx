@@ -77,7 +77,7 @@ function AuthPage() {
         <p className="relative mt-10 text-xs text-primary-foreground/70">© {new Date().getFullYear()} Empilha Nobre · Distribuidor HELI</p>
       </section>
 
-      <section className="relative flex flex-col items-center justify-center lg:px-5 lg:py-10">
+      <section className="relative flex flex-col items-center lg:justify-center lg:px-5 lg:py-10">
         <div className="relative w-full overflow-hidden rounded-b-[2.5rem] bg-brand-gradient px-6 pb-20 pt-10 text-primary-foreground lg:hidden">
           <div className="absolute inset-0 opacity-[0.08] [background-image:repeating-linear-gradient(135deg,currentColor_0_2px,transparent_2px_22px)]" aria-hidden />
           <div className="relative mx-auto flex w-fit rounded-2xl bg-card px-5 py-3 shadow-soft"><BrandFull className="h-8" /></div>
