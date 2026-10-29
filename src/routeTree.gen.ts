@@ -20,6 +20,7 @@ import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
 import { Route as AuthenticatedTecnicosRouteImport } from './routes/_authenticated/tecnicos'
+import { Route as ConviteTokenRouteImport } from './routes/convite.$token'
 import { Route as AuthenticatedAdminAcessosRouteImport } from './routes/_authenticated/admin.acessos'
 import { Route as AuthenticatedClientesIndexRouteImport } from './routes/_authenticated/clientes.index'
 import { Route as AuthenticatedClientesIdRouteImport } from './routes/_authenticated/clientes.$id'
@@ -84,6 +85,11 @@ const AuthenticatedTecnicosRoute = AuthenticatedTecnicosRouteImport.update({
   path: '/tecnicos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ConviteTokenRoute = ConviteTokenRouteImport.update({
+  id: '/convite/$token',
+  path: '/convite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminAcessosRoute =
   AuthenticatedAdminAcessosRouteImport.update({
     id: '/admin/acessos',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/admin/acessos': typeof AuthenticatedAdminAcessosRoute
   '/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/admin/acessos': typeof AuthenticatedAdminAcessosRoute
   '/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/tecnicos': typeof AuthenticatedTecnicosRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/_authenticated/admin/acessos': typeof AuthenticatedAdminAcessosRoute
   '/_authenticated/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/_authenticated/equipamentos/$id': typeof AuthenticatedEquipamentosIdRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/tecnicos'
+    | '/convite/$token'
     | '/admin/acessos'
     | '/clientes/$id'
     | '/equipamentos/$id'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/tecnicos'
+    | '/convite/$token'
     | '/admin/acessos'
     | '/clientes/$id'
     | '/equipamentos/$id'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/relatorios'
     | '/_authenticated/tecnicos'
+    | '/convite/$token'
     | '/_authenticated/admin/acessos'
     | '/_authenticated/clientes/$id'
     | '/_authenticated/equipamentos/$id'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ConviteTokenRoute: typeof ConviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tecnicos'
       preLoaderRoute: typeof AuthenticatedTecnicosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/convite/$token': {
+      id: '/convite/$token'
+      path: '/convite/$token'
+      fullPath: '/convite/$token'
+      preLoaderRoute: typeof ConviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/acessos': {
       id: '/_authenticated/admin/acessos'
@@ -465,6 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ConviteTokenRoute: ConviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -518,6 +518,7 @@ export type Database = {
           phone: string | null
           revoked_at: string | null
           role: Database["public"]["Enums"]["app_role"]
+          token_hash: string | null
           used_at: string | null
           used_by: string | null
         }
@@ -532,6 +533,7 @@ export type Database = {
           phone?: string | null
           revoked_at?: string | null
           role: Database["public"]["Enums"]["app_role"]
+          token_hash?: string | null
           used_at?: string | null
           used_by?: string | null
         }
@@ -546,6 +548,7 @@ export type Database = {
           phone?: string | null
           revoked_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          token_hash?: string | null
           used_at?: string | null
           used_by?: string | null
         }

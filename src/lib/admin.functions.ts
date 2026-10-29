@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { hashInviteToken, inviteUrl, newInviteToken } from "./invite-token";
 
 const roleEnum = z.enum(["admin", "ceo", "diretor_comercial", "gestor_manutencao", "almoxarifado", "tecnico"]);
 const FULL = ["admin", "ceo", "diretor_comercial", "gestor_manutencao"] as const;
@@ -13,20 +14,8 @@ async function requireAdmin(sb: { rpc: (fn: "my_org" | "my_role") => PromiseLike
   return org as string;
 }
 
-/** Endereço fixo do site publicado: links de convite nunca levam ao editor. */
-const PUBLIC_APP_URL = "https://nobreempilhadeiras.lovable.app";
-
-type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
-
-async function accessLink(sb: Admin, email: string) {
-  const redirectTo = `${PUBLIC_APP_URL}/reset-password`;
-  const inv = await sb.auth.admin.generateLink({ type: "invite", email, options: { redirectTo } });
-  if (!inv.error) return { link: inv.data.properties?.action_link ?? null, existingUser: false };
-  const rec = await sb.auth.admin.generateLink({ type: "recovery", email, options: { redirectTo } });
-  return { link: rec.data?.properties?.action_link ?? null, existingUser: true };
-}
-
-/** Convite individual: vinculado a e-mail e organização, expira em 7 dias, uso único. */
+/** Convite individual: vinculado a e-mail e organização, expira em 7 dias, uso único.
+ *  O link aponta para /convite/<token> no site publicado; só o hash do token é salvo. */
 export const inviteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({
@@ -42,29 +31,39 @@ export const inviteUser = createServerFn({ method: "POST" })
     const { count } = await supabaseAdmin.from("invitations").select("id", { count: "exact", head: true }).eq("created_by", context.userId).gte("created_at", since);
     if ((count ?? 0) >= 20) throw new Error("Limite de convites por hora atingido.");
     await supabaseAdmin.from("invitations").update({ revoked_at: new Date().toISOString() }).eq("organization_id", org).eq("email", data.email).is("used_at", null).is("revoked_at", null);
-    const { error } = await supabaseAdmin.from("invitations").insert({ organization_id: org, email: data.email, role: data.role, phone: data.phone || null, full_name: data.fullName || null, expires_at: new Date(Date.now() + 7 * 86400_000).toISOString(), created_by: context.userId });
+    const token = newInviteToken();
+    const { error } = await supabaseAdmin.from("invitations").insert({ organization_id: org, email: data.email, role: data.role, phone: data.phone || null, full_name: data.fullName || null, token_hash: await hashInviteToken(token), expires_at: new Date(Date.now() + 7 * 86400_000).toISOString(), created_by: context.userId });
     if (error) throw new Error("Falha ao registrar convite");
-    let emailSent = false;
-    if (data.channel === "email") {
-      const { error: ie } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, { redirectTo: `${PUBLIC_APP_URL}/reset-password` });
-      emailSent = !ie;
-    }
-    const { link, existingUser } = await accessLink(supabaseAdmin, data.email);
-    return { ok: true, existingUser, emailSent, link };
+    return { ok: true, link: inviteUrl(token) };
   });
 
-/** Gera de novo o link de acesso de um convite pendente (para copiar ou mandar no WhatsApp). */
+/** Gera um link novo para um convite não usado (o link anterior deixa de funcionar). */
 export const resendInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: inv } = await supabaseAdmin.from("invitations").select("email, phone, full_name, used_at, revoked_at, expires_at").eq("id", data.id).eq("organization_id", org).maybeSingle();
+    const { data: inv } = await supabaseAdmin.from("invitations").select("email, phone, full_name, used_at, revoked_at").eq("id", data.id).eq("organization_id", org).maybeSingle();
     if (!inv || inv.used_at || inv.revoked_at) throw new Error("Convite não está pendente.");
-    if (inv.expires_at < new Date().toISOString()) await supabaseAdmin.from("invitations").update({ expires_at: new Date(Date.now() + 7 * 86400_000).toISOString() }).eq("id", data.id);
-    const { link } = await accessLink(supabaseAdmin, inv.email);
-    return { link, phone: inv.phone, fullName: inv.full_name };
+    const token = newInviteToken();
+    const { error } = await supabaseAdmin.from("invitations").update({ token_hash: await hashInviteToken(token), expires_at: new Date(Date.now() + 7 * 86400_000).toISOString() }).eq("id", data.id);
+    if (error) throw new Error("Falha ao gerar o link");
+    return { link: inviteUrl(token), phone: inv.phone, fullName: inv.full_name };
+  });
+
+/** Exclui um convite não usado; o link dele para de funcionar na hora. */
+export const deleteInvitation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const org = await requireAdmin(context.supabase as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: gone, error } = await supabaseAdmin.from("invitations").delete().eq("id", data.id).eq("organization_id", org).is("used_at", null).select("email, role");
+    if (error) throw new Error("Falha ao excluir convite");
+    if (!gone?.length) throw new Error("Convites já usados não podem ser excluídos.");
+    await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action: "invite_deleted", entity: "invitations", entity_id: data.id, changes: { email: gone[0]!.email, role: gone[0]!.role } });
+    return { ok: true };
   });
 
 export const revokeInvitation = createServerFn({ method: "POST" })
