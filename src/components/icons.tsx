@@ -7,8 +7,9 @@ export function WhatsAppIcon({ className = "h-4 w-4" }: { className?: string }) 
 }
 
 /** Link do WhatsApp sem mensagem pronta. */
-export function waLink(phone: string | null | undefined) {
+export function waLink(phone: string | null | undefined, text?: string) {
   const d = (phone ?? "").replace(/\D/g, "");
   if (!d) return null;
-  return `https://wa.me/${d.startsWith("55") && d.length > 11 ? d : `55${d}`}`;
+  const base = `https://wa.me/${d.startsWith("55") && d.length > 11 ? d : `55${d}`}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
