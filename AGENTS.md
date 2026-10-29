@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Roles: business roles (ceo, diretor_comercial, gestor_manutencao, almoxarifado) map to legacy permission levels via public.effective_role / effectiveRole(); DB policies and PERM check the effective level, UI shows the real role — so permissions live in one place.
