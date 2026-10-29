@@ -3,7 +3,7 @@
 ## 1. Login no celular (o computador não muda)
 - Topo vermelho HELI com curva suave, logo HELI + Nobre num cartão branco e a frase "Sua operação de empilhadeiras, sob controle."
 - Formulário num cartão branco que sobe por cima do vermelho, com campos grandes e botão "Entrar" largo, fácil de tocar.
-- Rodapé pequeno "Empilha Nobre · Distribuidor HELI".
+- Rodapé pequeno "Empilha Nobre · Representante HELI BRASIL".
 - Só vale para telas pequenas. No computador a tela fica exatamente igual.
 
 ## 2. Aba "Checklists" no menu (grupo Operação)
