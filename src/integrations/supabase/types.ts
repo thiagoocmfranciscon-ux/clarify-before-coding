@@ -472,6 +472,8 @@ export type Database = {
       organization_members: {
         Row: {
           active: boolean
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -482,6 +484,8 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -492,6 +496,8 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
