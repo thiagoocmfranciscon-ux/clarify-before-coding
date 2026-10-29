@@ -61,8 +61,8 @@ export const updateMember = createServerFn({ method: "POST" })
     }
     const now = new Date().toISOString();
     const patch: Record<string, unknown> = { role: nextRole, active: nextActive, updated_at: now };
-    if (data.archive === true) { patch.archived_at = now; patch.archived_by = context.userId; }
-    if (data.archive === false) { patch.archived_at = null; patch.archived_by = null; }
+    if (data.archive === true) { patch["archived_at"] = now; patch["archived_by"] = context.userId; }
+    if (data.archive === false) { patch["archived_at"] = null; patch["archived_by"] = null; }
     const { error } = await supabaseAdmin.from("organization_members").update(patch as never).eq("id", m.id);
     if (error) throw new Error("Falha ao atualizar acesso");
     const action = data.archive === true ? "user_archived" : data.archive === false ? "user_restored" : nextActive ? "role_change" : "access_revoked";
