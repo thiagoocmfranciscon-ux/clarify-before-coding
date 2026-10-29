@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { Eye, EyeOff, Loader2, ShieldCheck, Wrench, Boxes } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { BrandMark, BrandFull } from "@/components/brand";
+import { BrandFull } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,7 +84,6 @@ function AuthPage() {
           <p className="relative mx-auto mt-6 max-w-xs text-center text-lg font-semibold leading-snug">Sua operação de empilhadeiras, sob controle.</p>
         </div>
         <div className="relative z-10 -mt-12 w-[calc(100%-2.5rem)] max-w-sm animate-in fade-in slide-in-from-bottom-2 rounded-2xl bg-card p-6 shadow-soft duration-500 max-lg:border lg:mt-0 lg:w-full lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-          <span className="hidden"><BrandMark className="h-10" /></span>
           <h1 className="text-2xl font-bold lg:text-3xl">{mode === "login" ? "Bem-vindo de volta" : "Recuperar senha"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {mode === "login" ? "Acesso restrito a usuários convidados pela administração." : "Enviaremos um link para o seu e-mail."}
@@ -118,6 +117,7 @@ function AuthPage() {
             {mode === "login" ? "Esqueci minha senha" : "Voltar para o login"}
           </button>
         </div>
+        <p className="py-6 text-center text-xs text-muted-foreground lg:hidden">Empilha Nobre · Representante HELI BRASIL</p>
       </section>
     </main>
   );
