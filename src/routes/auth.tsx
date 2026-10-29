@@ -77,10 +77,15 @@ function AuthPage() {
         <p className="relative mt-10 text-xs text-primary-foreground/70">© {new Date().getFullYear()} Empilha Nobre · Distribuidor HELI</p>
       </section>
 
-      <section className="flex items-center justify-center px-5 py-10">
-        <div className="w-full max-w-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <div className="lg:hidden"><BrandMark className="h-10" /></div>
-          <h1 className="mt-8 text-3xl font-bold lg:mt-0">{mode === "login" ? "Bem-vindo de volta" : "Recuperar senha"}</h1>
+      <section className="relative flex flex-col items-center justify-center lg:px-5 lg:py-10">
+        <div className="relative w-full overflow-hidden rounded-b-[2.5rem] bg-brand-gradient px-6 pb-20 pt-10 text-primary-foreground lg:hidden">
+          <div className="absolute inset-0 opacity-[0.08] [background-image:repeating-linear-gradient(135deg,currentColor_0_2px,transparent_2px_22px)]" aria-hidden />
+          <div className="relative mx-auto flex w-fit rounded-2xl bg-card px-5 py-3 shadow-soft"><BrandFull className="h-8" /></div>
+          <p className="relative mx-auto mt-6 max-w-xs text-center text-lg font-semibold leading-snug">Sua operação de empilhadeiras, sob controle.</p>
+        </div>
+        <div className="relative z-10 -mt-12 w-[calc(100%-2.5rem)] max-w-sm animate-in fade-in slide-in-from-bottom-2 rounded-2xl bg-card p-6 shadow-soft duration-500 max-lg:border lg:mt-0 lg:w-full lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+          <span className="hidden"><BrandMark className="h-10" /></span>
+          <h1 className="text-2xl font-bold lg:text-3xl">{mode === "login" ? "Bem-vindo de volta" : "Recuperar senha"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {mode === "login" ? "Acesso restrito a usuários convidados pela administração." : "Enviaremos um link para o seu e-mail."}
           </p>
