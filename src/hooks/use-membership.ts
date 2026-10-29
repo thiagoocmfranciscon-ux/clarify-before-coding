@@ -50,9 +50,15 @@ export function useMembership() {
   return q;
 }
 
-/** Hook para componentes dentro da área autenticada (associação garantida pelo layout). */
+let lastMembership: Membership | null = null;
+
+/** Hook para componentes dentro da área autenticada (associação garantida pelo layout).
+ * Durante a saída (cache limpo antes de navegar para /auth) usa o último valor conhecido
+ * para não derrubar a tela. */
 export function useMe(): Membership {
   const { data } = useQuery(membershipQuery);
-  if (!data) throw new Error("Associação não carregada");
-  return data;
+  if (data) lastMembership = data;
+  const me = data ?? lastMembership;
+  if (!me) throw new Error("Associação não carregada");
+  return me;
 }
