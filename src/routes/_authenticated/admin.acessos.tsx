@@ -11,9 +11,9 @@ import { useMe } from "@/hooks/use-membership";
 import { ASSIGNABLE_ROLES, PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
-import { inviteUser, listMembers, resendInvite, revokeInvitation, updateMember } from "@/lib/admin.functions";
+import { deleteInvitation, inviteUser, listMembers, resendInvite, updateMember } from "@/lib/admin.functions";
 import { memberStatus } from "@/lib/domain";
-import { Archive, ArrowLeft, Copy, Mail } from "lucide-react";
+import { Archive, ArrowLeft, Copy, Link2, Trash2 } from "lucide-react";
 import { WhatsAppIcon, waLink } from "@/components/icons";
 
 const waText = (name: string | null | undefined, link: string) => `Olá${name ? ` ${name.split(" ")[0]}` : ""}! Você foi convidado para o sistema Empilha Nobre. Toque no link para criar sua senha e entrar:\n${link}`;
@@ -28,7 +28,7 @@ const ROLES = ASSIGNABLE_ROLES;
 
 function Page() {
   const me = useMe(); const qc = useQueryClient();
-  const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const revoke = useServerFn(revokeInvitation); const update = useServerFn(updateMember); const resend = useServerFn(resendInvite);
+  const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const remove = useServerFn(deleteInvitation); const update = useServerFn(updateMember); const resend = useServerFn(resendInvite);
   const [email, setEmail] = useState(""); const [channel, setChannel] = useState<"email" | "whatsapp">("email"); const [phone, setPhone] = useState(""); const [fullName, setFullName] = useState(""); const [role, setRole] = useState<AppRole>("tecnico");
   const [showArchived, setShowArchived] = useState(false);
   const [confirm, setConfirm] = useState<{ id: string; archive: boolean } | null>(null);
