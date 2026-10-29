@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BrandLockup } from "@/components/brand";
@@ -19,20 +19,32 @@ export const Route = createFileRoute("/reset-password")({
   component: ResetPassword,
 });
 
+function linkError(): string | null {
+  const params = new URLSearchParams(`${window.location.search.slice(1)}&${window.location.hash.replace(/^#/, "")}`);
+  const code = params.get("error_code") ?? params.get("error");
+  if (!code) return null;
+  return /expired/i.test(code) ? "Este link expirou ou já foi usado." : "Este link não é mais válido.";
+}
+
 function ResetPassword() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [invalid, setInvalid] = useState<string | null>(null);
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const err = linkError();
+    if (err) { setInvalid(err); return; }
+    let ok = false;
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") { ok = true; setReady(true); }
     });
-    supabase.auth.getSession().then(({ data: s }) => { if (s.session) setReady(true); });
-    return () => data.subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data: s }) => { if (s.session) { ok = true; setReady(true); } });
+    const t = setTimeout(() => { if (!ok) setInvalid("Não foi possível validar este link. Ele pode ter expirado ou já ter sido usado."); }, 5000);
+    return () => { clearTimeout(t); data.subscription.unsubscribe(); };
   }, []);
 
   async function submit(e: FormEvent) {
@@ -52,8 +64,14 @@ function ResetPassword() {
       <div className="w-full max-w-md rounded-xl bg-card p-8 shadow-xl">
         <BrandLockup />
         <h1 className="mt-8 text-2xl font-semibold">Definir nova senha</h1>
-        {!ready ? (
-          <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">Validando o link… Se esta mensagem persistir, solicite um novo link.</p>
+        {invalid ? (
+          <div className="mt-4 space-y-4">
+            <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{invalid}</p>
+            <p className="text-sm text-muted-foreground">Na tela de login, toque em "Esqueci minha senha" para receber um novo link. Se você recebeu um convite, peça um novo ao administrador.</p>
+            <Button asChild className="h-11 w-full"><Link to="/auth">Pedir novo link</Link></Button>
+          </div>
+        ) : !ready ? (
+          <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">Validando o link…</p>
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div className="space-y-1.5"><Label htmlFor="pw">Nova senha</Label><Input id="pw" type="password" autoComplete="new-password" className="h-11" value={pw} onChange={(e) => setPw(e.target.value)} /></div>
