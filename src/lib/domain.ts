@@ -1,12 +1,24 @@
 // Regras de domínio puras (espelham as regras do banco para feedback imediato; o banco é a autoridade).
-export type AppRole = "admin" | "gestor" | "tecnico" | "almoxarife" | "leitura";
+export type AppRole = "admin" | "gestor" | "tecnico" | "almoxarife" | "leitura" | "ceo" | "diretor_comercial" | "gestor_manutencao" | "almoxarifado";
 export type WoStatus =
   | "aberta" | "em_diagnostico" | "aguardando_peca" | "em_andamento"
   | "concluida_tecnicamente" | "encerrada" | "cancelada";
 
 export const ROLE_LABEL: Record<AppRole, string> = {
-  admin: "Administrador", gestor: "Gestor operacional", tecnico: "Técnico", almoxarife: "Almoxarife", leitura: "Leitura",
+  admin: "Setor Técnico", ceo: "CEO", diretor_comercial: "Diretor Comercial", gestor_manutencao: "Gestor de Manutenção",
+  almoxarifado: "Almoxarifado", tecnico: "Técnicos",
+  gestor: "Gestor (antigo)", almoxarife: "Almoxarife (antigo)", leitura: "Leitura (antigo)",
 };
+/** Papéis oferecidos na tela de Acessos. */
+export const ASSIGNABLE_ROLES: AppRole[] = ["admin", "ceo", "diretor_comercial", "gestor_manutencao", "almoxarifado", "tecnico"];
+/** Papéis com acesso total (inclusive Acessos). */
+export const FULL_ACCESS_ROLES: AppRole[] = ["admin", "ceo", "diretor_comercial", "gestor_manutencao"];
+/** Converte o papel cadastrado no nível de permissão equivalente (espelha public.effective_role). */
+export function effectiveRole(r: AppRole): AppRole {
+  if (r === "ceo" || r === "diretor_comercial" || r === "gestor_manutencao") return "admin";
+  if (r === "almoxarifado") return "almoxarife";
+  return r;
+}
 
 export const WO_STATUS_LABEL: Record<WoStatus, string> = {
   aberta: "Aberta", em_diagnostico: "Em diagnóstico", aguardando_peca: "Aguardando peça", em_andamento: "Em andamento",

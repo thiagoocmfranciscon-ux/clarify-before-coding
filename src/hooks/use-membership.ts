@@ -1,11 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { AppRole } from "@/lib/domain";
+import { effectiveRole, type AppRole } from "@/lib/domain";
 
 export type Membership = {
   userId: string;
   email: string;
+  /** Nível de permissão efetivo. */
   role: AppRole;
+  /** Papel cadastrado (para exibir). */
+  realRole: AppRole;
   organizationId: string;
   organizationName: string;
   fullName: string | null;
@@ -33,7 +36,8 @@ export async function fetchMembership(): Promise<Membership | null> {
   return {
     userId: u.user.id,
     email: u.user.email ?? "",
-    role: m.role as AppRole,
+    role: effectiveRole(m.role as AppRole),
+    realRole: m.role as AppRole,
     organizationId: m.organization_id,
     organizationName: (m.organizations as { name: string } | null)?.name ?? "",
     fullName: p?.full_name ?? null,

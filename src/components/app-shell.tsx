@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   BarChart3, Boxes, ClipboardList, FileText, Forklift, LayoutDashboard, LogOut, Menu, Search, ShieldCheck,
-  Truck, User, Users, Building2, History, Settings, KeyRound,
+  Truck, User, ListChecks, Users, Building2, History, Settings, KeyRound,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -22,11 +22,12 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; show: 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, show: () => true, group: "Operação" },
   { to: "/os", label: "Ordens de Serviço", icon: ClipboardList, show: () => true, group: "Operação" },
-  { to: "/estoque", label: "Estoque de Peças", icon: Boxes, show: (r) => r !== "tecnico", group: "Operação" },
-  { to: "/frotas", label: "Frotas", icon: Truck, show: PERM.fleet, group: "Operação" },
-  { to: "/tecnicos", label: "Técnicos", icon: Users, show: (r) => r !== "tecnico", group: "Cadastros" },
-  { to: "/clientes", label: "Clientes", icon: Building2, show: (r) => r !== "tecnico", group: "Cadastros" },
-  { to: "/equipamentos", label: "Equipamentos", icon: Forklift, show: (r) => r !== "tecnico", group: "Cadastros" },
+  { to: "/estoque", label: "Estoque de Peças", icon: Boxes, show: () => true, group: "Operação" },
+  { to: "/frotas", label: "Frotas", icon: Truck, show: (r) => PERM.fleet(r) || r === "tecnico", group: "Operação" },
+  { to: "/checklists", label: "Checklists", icon: ListChecks, show: () => true, group: "Operação" },
+  { to: "/tecnicos", label: "Técnicos", icon: Users, show: (r) => r !== "tecnico" && r !== "almoxarife", group: "Cadastros" },
+  { to: "/clientes", label: "Clientes", icon: Building2, show: (r) => r !== "tecnico" && r !== "almoxarife", group: "Cadastros" },
+  { to: "/equipamentos", label: "Equipamentos", icon: Forklift, show: (r) => r !== "tecnico" && r !== "almoxarife", group: "Cadastros" },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3, show: PERM.seeCosts, group: "Gestão" },
   { to: "/admin/acessos", label: "Acessos", icon: ShieldCheck, show: PERM.admin, group: "Gestão" },
   { to: "/auditoria", label: "Auditoria", icon: History, show: PERM.audit, group: "Gestão" },
@@ -75,7 +76,7 @@ function UserMenu({ onSignOut }: { onSignOut: () => void }) {
         </span>
         <span className="hidden min-w-0 text-left sm:block">
           <span className="block max-w-[180px] truncate text-sm font-semibold text-foreground">{name}</span>
-          <span className="block text-xs text-muted-foreground">{ROLE_LABEL[me.role]}</span>
+          <span className="block text-xs text-muted-foreground">{ROLE_LABEL[me.realRole]}</span>
         </span>
         <Settings className="hidden h-4 w-4 text-muted-foreground sm:block" aria-hidden />
       </DropdownMenuTrigger>
