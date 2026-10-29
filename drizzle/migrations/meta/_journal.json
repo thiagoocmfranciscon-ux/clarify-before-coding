@@ -50,6 +50,13 @@
       "when": 1793309173696,
       "tag": "0006_tecnico_reads_stock_fleet",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793311909837,
+      "tag": "0007_invitation_phone",
+      "breakpoints": true
     }
   ]
 }
