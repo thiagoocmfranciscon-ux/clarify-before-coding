@@ -34,13 +34,12 @@ Itens de cada sub-aba:
 | Almoxarifado | Dashboard, OS, Estoque de peças, Frotas |
 | Técnicos | Dashboard, Frotas, OS, Estoque de peças |
 
-- Quem já tem um papel passa para o papel novo equivalente: gestor vira Gestor de Manutenção, técnico vira Técnicos, almoxarife vira Almoxarifado e leitura vira Serviços gerais. Você continua como Setor Técnico.
+- Quem já tem um papel passa para o papel novo equivalente: gestor vira Gestor de Manutenção, técnico vira Técnicos, almoxarife vira Almoxarifado e leitura (se existir) vira Técnicos. Você continua como Setor Técnico.
 - Checklists ficam liberados para todos os papéis que veem OS.
-- Ponto a confirmar: você não citou "Serviços gerais" nas permissões, então esse papel fica só com acesso de leitura ao Dashboard. Me avise se for diferente.
 
 ## Detalhes técnicos
 - Login: classes `lg:hidden` / `max-lg:` em `auth.tsx`, sem mudar o bloco `lg:`.
-- Novos valores no enum `app_role` (`ceo`, `diretor_comercial`, `gestor_manutencao`, `almoxarifado`, `servicos_gerais`). `admin` continua no banco, com o rótulo "Setor Técnico", e `tecnico` continua, com o rótulo "Técnicos". Os papéis antigos não são removidos, só deixam de ser oferecidos. A troca dos usuários atuais é feita junto com a mudança.
+- Novos valores no enum `app_role` (`ceo`, `diretor_comercial`, `gestor_manutencao`, `almoxarifado`). `admin` continua no banco, com o rótulo "Setor Técnico", e `tecnico` continua, com o rótulo "Técnicos". Os papéis antigos não são removidos, só deixam de ser oferecidos. A troca dos usuários atuais é feita junto com a mudança.
 - `has_any_role` e as regras de acesso do banco são atualizadas para os novos papéis. `PERM` em `domain.ts` e os grupos do menu são reescritos.
 - Tabelas novas: `checklist_templates` (tipo de máquina, versão, itens em jsonb, flag `needs_validation`) e `checklists` (cabeçalho, kind entrega/retorno, tipos[], respostas jsonb, observações, assinaturas, equipment_id/customer_id, versão do modelo). Ambas com GRANT, RLS por organização e auditoria. Os 4 modelos são criados junto.
 - Fotos via `attachments` com `entity_type='checklist'`. PDF em `reports.ts` com pdf-lib.
