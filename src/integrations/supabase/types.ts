@@ -101,6 +101,178 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_templates: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          machine_type: string
+          needs_validation: boolean
+          organization_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items?: Json
+          machine_type: string
+          needs_validation?: boolean
+          organization_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          machine_type?: string
+          needs_validation?: boolean
+          organization_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklists: {
+        Row: {
+          answers: Json
+          archived_at: string | null
+          archived_by: string | null
+          bad_count: number
+          brand: string | null
+          check_date: string
+          check_time: string | null
+          consultant: string | null
+          contract: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          customer_notes: string | null
+          customer_signer: string | null
+          equipment_id: string | null
+          fleet_number: string | null
+          hour_meter: number | null
+          id: string
+          invoice: string | null
+          kind: string
+          machine_type: string
+          model: string | null
+          organization_id: string
+          responsible_cpf: string | null
+          responsible_name: string | null
+          serial: string | null
+          tech_notes: string | null
+          template_id: string
+          template_version: number
+          types: string[]
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          answers?: Json
+          archived_at?: string | null
+          archived_by?: string | null
+          bad_count?: number
+          brand?: string | null
+          check_date?: string
+          check_time?: string | null
+          consultant?: string | null
+          contract?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_notes?: string | null
+          customer_signer?: string | null
+          equipment_id?: string | null
+          fleet_number?: string | null
+          hour_meter?: number | null
+          id?: string
+          invoice?: string | null
+          kind: string
+          machine_type: string
+          model?: string | null
+          organization_id: string
+          responsible_cpf?: string | null
+          responsible_name?: string | null
+          serial?: string | null
+          tech_notes?: string | null
+          template_id: string
+          template_version: number
+          types?: string[]
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          answers?: Json
+          archived_at?: string | null
+          archived_by?: string | null
+          bad_count?: number
+          brand?: string | null
+          check_date?: string
+          check_time?: string | null
+          consultant?: string | null
+          contract?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_notes?: string | null
+          customer_signer?: string | null
+          equipment_id?: string | null
+          fleet_number?: string | null
+          hour_meter?: number | null
+          id?: string
+          invoice?: string | null
+          kind?: string
+          machine_type?: string
+          model?: string | null
+          organization_id?: string
+          responsible_cpf?: string | null
+          responsible_name?: string | null
+          serial?: string | null
+          tech_notes?: string | null
+          template_id?: string
+          template_version?: number
+          types?: string[]
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklists_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklists_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklists_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklists_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_contacts: {
         Row: {
           archived_at: string | null
@@ -1604,6 +1776,10 @@ export type Database = {
         }
       }
       dashboard_kpis: { Args: { p_from: string; p_to: string }; Returns: Json }
+      effective_role: {
+        Args: { _r: Database["public"]["Enums"]["app_role"] }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       global_search: { Args: { p_q: string }; Returns: Json }
       has_any_role: {
         Args: {
@@ -1726,7 +1902,16 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "gestor" | "tecnico" | "almoxarife" | "leitura"
+      app_role:
+        | "admin"
+        | "gestor"
+        | "tecnico"
+        | "almoxarife"
+        | "leitura"
+        | "ceo"
+        | "diretor_comercial"
+        | "gestor_manutencao"
+        | "almoxarifado"
       stock_mov_type:
         | "abertura"
         | "entrada"
@@ -1871,7 +2056,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "gestor", "tecnico", "almoxarife", "leitura"],
+      app_role: [
+        "admin",
+        "gestor",
+        "tecnico",
+        "almoxarife",
+        "leitura",
+        "ceo",
+        "diretor_comercial",
+        "gestor_manutencao",
+        "almoxarifado",
+      ],
       stock_mov_type: [
         "abertura",
         "entrada",
