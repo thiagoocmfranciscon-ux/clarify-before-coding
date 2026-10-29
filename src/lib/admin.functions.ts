@@ -43,21 +43,30 @@ export const revokeInvitation = createServerFn({ method: "POST" })
 
 export const updateMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => z.object({ memberId: z.string().uuid(), role: roleEnum.optional(), active: z.boolean().optional() }).parse(i))
+  .inputValidator((i: unknown) => z.object({ memberId: z.string().uuid(), role: roleEnum.optional(), active: z.boolean().optional(), archive: z.boolean().optional() }).parse(i))
   .handler(async ({ data, context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: m } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
+    const { data: m } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, archived_at").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
     if (!m) throw new Error("Associação não encontrada");
     if (m.user_id === context.userId) throw new Error("Você não pode alterar o próprio acesso.");
-    const nextRole = data.role ?? m.role; const nextActive = data.active ?? m.active;
-    if (m.role === "admin" && (nextRole !== "admin" || !nextActive)) {
+    const isArchived = !!m.archived_at;
+    if (isArchived && data.archive !== false) throw new Error("Restaure o usuário antes de alterar o acesso.");
+    const nextRole = data.role ?? m.role;
+    // Arquivar sempre encerra o acesso; restaurar volta como revogado.
+    const nextActive = data.archive !== undefined ? false : (data.active ?? m.active);
+    if (m.role === "admin" && m.active && (nextRole !== "admin" || !nextActive)) {
       const { count } = await supabaseAdmin.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", org).eq("role", "admin").eq("active", true);
       if ((count ?? 0) <= 1) throw new Error("A organização precisa de ao menos um administrador ativo.");
     }
-    const { error } = await supabaseAdmin.from("organization_members").update({ role: nextRole, active: nextActive, updated_at: new Date().toISOString() }).eq("id", m.id);
+    const now = new Date().toISOString();
+    const patch: Record<string, unknown> = { role: nextRole, active: nextActive, updated_at: now };
+    if (data.archive === true) { patch.archived_at = now; patch.archived_by = context.userId; }
+    if (data.archive === false) { patch.archived_at = null; patch.archived_by = null; }
+    const { error } = await supabaseAdmin.from("organization_members").update(patch as never).eq("id", m.id);
     if (error) throw new Error("Falha ao atualizar acesso");
-    await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action: nextActive ? "role_change" : "access_revoked", entity: "organization_members", entity_id: m.id, changes: { role: { de: m.role, para: nextRole }, active: { de: m.active, para: nextActive } } });
+    const action = data.archive === true ? "user_archived" : data.archive === false ? "user_restored" : nextActive ? "role_change" : "access_revoked";
+    await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action, entity: "organization_members", entity_id: m.id, changes: { role: { de: m.role, para: nextRole }, active: { de: m.active, para: nextActive }, ...(data.archive !== undefined ? { arquivado: { de: isArchived, para: data.archive } } : {}) } });
     return { ok: true };
   });
 
