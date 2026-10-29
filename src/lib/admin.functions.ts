@@ -75,7 +75,7 @@ export const listMembers = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: members } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, created_at").eq("organization_id", org).order("created_at");
+    const { data: members } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, created_at, archived_at").eq("organization_id", org).order("created_at");
     const { data: invites } = await supabaseAdmin.from("invitations").select("id, email, role, expires_at, used_at, revoked_at, created_at").eq("organization_id", org).order("created_at", { ascending: false }).limit(100);
     const ids = (members ?? []).map((m) => m.user_id);
     const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
