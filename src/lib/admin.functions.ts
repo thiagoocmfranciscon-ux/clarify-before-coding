@@ -2,7 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const roleEnum = z.enum(["admin", "gestor", "tecnico", "almoxarife", "leitura"]);
+const roleEnum = z.enum(["admin", "ceo", "diretor_comercial", "gestor_manutencao", "almoxarifado", "tecnico"]);
+const FULL = ["admin", "ceo", "diretor_comercial", "gestor_manutencao"] as const;
+const isFull = (r: string) => (FULL as readonly string[]).includes(r);
 
 async function requireAdmin(sb: { rpc: (fn: "my_org" | "my_role") => PromiseLike<{ data: unknown }> }) {
   const { data: org } = await sb.rpc("my_org");
@@ -55,8 +57,8 @@ export const updateMember = createServerFn({ method: "POST" })
     const nextRole = data.role ?? m.role;
     // Arquivar sempre encerra o acesso; restaurar volta como revogado.
     const nextActive = data.archive !== undefined ? false : (data.active ?? m.active);
-    if (m.role === "admin" && m.active && (nextRole !== "admin" || !nextActive)) {
-      const { count } = await supabaseAdmin.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", org).eq("role", "admin").eq("active", true);
+    if (isFull(m.role) && m.active && (!isFull(nextRole) || !nextActive)) {
+      const { count } = await supabaseAdmin.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", org).in("role", [...FULL]).eq("active", true);
       if ((count ?? 0) <= 1) throw new Error("A organização precisa de ao menos um administrador ativo.");
     }
     const now = new Date().toISOString();

@@ -18,7 +18,7 @@ async function sha256(file: File) {
   return Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function AttachmentsPanel({ entityType, entityId, canUpload }: { entityType: "work_order" | "equipment" | "vehicle"; entityId: string; canUpload: boolean }) {
+export function AttachmentsPanel({ entityType, entityId, canUpload }: { entityType: "work_order" | "equipment" | "vehicle" | "checklist"; entityId: string; canUpload: boolean }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [docType, setDocType] = useState("foto");

@@ -130,7 +130,7 @@ export const PERM = {
   admin: (r?: AppRole | null) => r === "admin",
   stock: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "almoxarife",
   seeCosts: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "leitura",
-  seeStock: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "almoxarife" || r === "leitura",
+  seeStock: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "almoxarife" || r === "leitura" || r === "tecnico",
   export: (r?: AppRole | null) => r === "admin" || r === "gestor",
   fleet: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "leitura" || r === "almoxarife",
   audit: (r?: AppRole | null) => r === "admin" || r === "gestor",

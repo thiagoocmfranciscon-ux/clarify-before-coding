@@ -8,7 +8,7 @@ import { Table, td } from "@/components/crud";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMe } from "@/hooks/use-membership";
-import { PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
+import { ASSIGNABLE_ROLES, PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
 import { inviteUser, listMembers, revokeInvitation, updateMember } from "@/lib/admin.functions";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin/acessos")({
   component: Page,
 });
 
-const ROLES = Object.keys(ROLE_LABEL) as AppRole[];
+const ROLES = ASSIGNABLE_ROLES;
 
 function Page() {
   const me = useMe(); const qc = useQueryClient();

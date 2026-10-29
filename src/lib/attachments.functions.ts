@@ -10,7 +10,7 @@ const ALLOWED: Record<string, number> = {
 export const createAttachmentUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({
-    entityType: z.enum(["work_order", "equipment", "vehicle"]), entityId: z.string().uuid(),
+    entityType: z.enum(["work_order", "equipment", "vehicle", "checklist"]), entityId: z.string().uuid(),
     fileName: z.string().min(1).max(200), mime: z.string(), size: z.number().int().positive(),
     docType: z.enum(["foto", "laudo", "art", "nota", "outro"]), externalNumber: z.string().max(60).optional(),
   }).parse(i))
@@ -27,6 +27,9 @@ export const createAttachmentUpload = createServerFn({ method: "POST" })
       const { data: v } = await sb.rpc("can_view_wo", { _wo: data.entityId });
       const { data: w } = await sb.from("work_orders").select("status").eq("id", data.entityId).maybeSingle();
       ok = !!v && !!w && !["encerrada", "cancelada"].includes(w.status) && role !== "leitura" && role !== "almoxarife";
+    } else if (data.entityType === "checklist") {
+      const { data: row } = await sb.from("checklists").select("id").eq("id", data.entityId).maybeSingle();
+      ok = !!row;
     } else {
       const table = data.entityType === "equipment" ? "equipment" : "vehicles";
       const { data: row } = await sb.from(table).select("id").eq("id", data.entityId).maybeSingle();

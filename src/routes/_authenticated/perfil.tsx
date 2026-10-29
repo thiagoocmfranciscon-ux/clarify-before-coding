@@ -46,7 +46,7 @@ function Page() {
   }
   return (
     <>
-      <PageHeader title="Meu Perfil" description={`${me.email} · ${ROLE_LABEL[me.role]} · ${me.organizationName}`} />
+      <PageHeader title="Meu Perfil" description={`${me.email} · ${ROLE_LABEL[me.realRole]} · ${me.organizationName}`} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <h2 className="mb-3 font-semibold">Dados</h2>
