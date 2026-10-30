@@ -23,10 +23,14 @@ function Page() {
   const createUp = useServerFn(createAvatarUpload); const fin = useServerFn(finalizeAvatar); const getUrl = useServerFn(getAvatarUrl);
   const avatar = useQuery({ queryKey: ["avatar", me.userId, me.avatarPath], enabled: !!me.avatarPath, queryFn: async () => (await getUrl({ data: { userId: me.userId } })).url });
 
+  const [phone, setPhone] = useState("");
+  useEffect(() => { supabase.from("profiles").select("phone").eq("id", me.userId).maybeSingle().then(({ data }) => setPhone(formatPhone(data?.phone ?? ""))); }, [me.userId]);
   async function saveName() {
+    const digits = phone.replace(/\D/g, "");
+    if (digits && (digits.length < 10 || digits.length > 11)) { toast.error("Telefone inválido. Use DDD + número."); return; }
     setBusy(true);
-    const { error } = await supabase.from("profiles").update({ full_name: name.trim() || null }).eq("id", me.userId);
-    setBusy(false); if (error) toast.error(friendlyError(error)); else { toast.success("Nome atualizado"); qc.invalidateQueries({ queryKey: ["membership"] }); }
+    const { error } = await supabase.from("profiles").update({ full_name: name.trim() || null, phone: digits || null }).eq("id", me.userId);
+    setBusy(false); if (error) toast.error(friendlyError(error)); else { toast.success("Dados atualizados"); qc.invalidateQueries({ queryKey: ["membership"] }); }
   }
   async function changePw() {
     if (pw.length < 8) { toast.error("A senha deve ter ao menos 8 caracteres"); return; }
@@ -56,6 +60,7 @@ function Page() {
             <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => fileRef.current?.click()}>Trocar foto</Button>
           </div>
           <Field id="pn" label="Nome completo"><Input id="pn" className="h-11" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} /></Field>
+          <div className="mt-3"><Field id="pp" label="Telefone (WhatsApp)"><Input id="pp" type="tel" inputMode="tel" placeholder="(11) 98765-4321" className="h-11" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} /></Field></div>
           <Button className="mt-3 min-h-11" disabled={busy} onClick={saveName}>Salvar</Button>
         </Card>
         <Card>
