@@ -112,7 +112,7 @@ function Page() {
                 <Table head={["Nome", "E-mail", "Papel", "Situação", ""]}>
                   {current.map((m) => (
                     <tr key={m.id}>
-                      <td className={td}>{m.full_name ?? "—"}</td><td className={td}>{m.email}</td>
+                      <td className={td}><div>{m.full_name ?? "—"}</div>{m.phone && <div className="text-xs text-muted-foreground">{m.phone}</div>}</td><td className={td}>{m.email}</td>
                       <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
                       <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>
                       <td className={td}>{m.user_id !== me.userId && (

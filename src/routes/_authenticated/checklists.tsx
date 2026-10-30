@@ -58,10 +58,10 @@ function Page() {
     <>
       <PageHeader title="Checklists" description="Entrega e retorno de máquinas, item por item."
         actions={<Button className="min-h-11" onClick={() => setEditing("new")} disabled={!tpl.data}><Plus className="mr-1 h-4 w-4" />Novo checklist</Button>} />
-      <div role="tablist" aria-label="Tipo de máquina" className="mb-5 flex gap-1 overflow-x-auto rounded-xl border bg-card p-1 [scrollbar-width:none]">
+      <div role="tablist" aria-label="Tipo de máquina" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border bg-card p-1 sm:flex sm:overflow-x-auto [scrollbar-width:none]">
         {MACHINE_TYPES.map((m) => (
           <button key={m.key} role="tab" aria-selected={tipo === m.key} onClick={() => navigate({ search: { tipo: m.key } })}
-            className={cn("min-h-10 shrink-0 rounded-lg px-4 text-sm font-medium transition", tipo === m.key ? "bg-primary text-primary-foreground shadow-soft" : "text-muted-foreground hover:bg-muted")}>
+            className={cn("min-h-11 rounded-lg px-3 py-1 text-center text-sm font-medium leading-tight transition sm:shrink-0 sm:px-4", tipo === m.key ? "bg-primary text-primary-foreground shadow-soft" : "text-muted-foreground hover:bg-muted")}>
             {m.label}
           </button>
         ))}

@@ -32,6 +32,8 @@ export const acceptInviteWithPassword = createServerFn({ method: "POST" })
     try {
       let userId: string | null = null;
       const created = await supabaseAdmin.auth.admin.createUser({ email: inv.email, password: data.password, email_confirm: true, user_metadata: { full_name: inv.full_name ?? undefined } });
+      const cerr = created.error as { code?: string; message?: string } | null;
+      if (cerr && (cerr.code === "weak_password" || /weak|pwned|leaked|compromised/i.test(cerr.message ?? ""))) throw new Error("weak_password");
       if (created.data.user) userId = created.data.user.id;
       else {
         // Conta já existe (convite antigo ficou pela metade): define a senha.
@@ -43,7 +45,7 @@ export const acceptInviteWithPassword = createServerFn({ method: "POST" })
         }
         if (!userId) throw new Error("create_failed");
         const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: data.password, email_confirm: true });
-        if (error) throw new Error("update_failed");
+        if (error) throw new Error((error as { code?: string }).code === "weak_password" || /weak|pwned|leaked/i.test(error.message) ? "weak_password" : "update_failed");
       }
       const now = new Date().toISOString();
       const { error: me } = await supabaseAdmin.from("organization_members").upsert(
@@ -59,6 +61,7 @@ export const acceptInviteWithPassword = createServerFn({ method: "POST" })
       // Devolve o convite para poder tentar de novo.
       await supabaseAdmin.from("invitations").update({ used_at: null }).eq("id", inv.id);
       console.error("acceptInvite failed", e);
+      if (e instanceof Error && e.message === "weak_password") throw new Error("Esta senha é muito comum ou já apareceu em vazamentos na internet. Escolha outra, misturando letras, números e símbolos.");
       throw new Error("Não foi possível criar sua conta. Tente novamente em instantes.");
     }
   });
