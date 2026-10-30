@@ -16,7 +16,7 @@ Causa provável: a proteção contra senhas vazadas recusa senhas comuns, e a te
 - Na lista de convites, "Gerar novo link" ganha "Reenviar e-mail".
 - WhatsApp continua igual.
 
-**Requisito:** o envio automático precisa de um domínio seu (ex.: avisos@empilhanobre.com.br). Hoje não há domínio configurado. Vou abrir a configuração; até ser verificado (algumas horas), o botão cai no plano B (copiar link).
+**Requisito:** o envio automático precisa de um domínio próprio (ex.: empilhanobre.com.br). Um endereço Gmail (thiagoocmfranciscon@gmail.com) não pode ser o remetente, porque o Google não deixa outros sistemas enviarem em nome do gmail.com. Opções: usar um domínio que a empresa já tenha, ou comprar um em Configurações do projeto → Domínios. Até o domínio estar verificado, o botão usa o plano B (copiar link), e as demais correções (itens 1 e 2) já funcionam.
 
 ## Detalhes técnicos
 - `acceptInviteWithPassword`: tratar `weak_password`/`AuthApiError` de `createUser`, retornar mensagem específica; manter devolução do convite.
