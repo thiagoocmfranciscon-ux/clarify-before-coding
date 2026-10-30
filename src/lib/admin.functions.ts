@@ -113,11 +113,11 @@ export const listMembers = createServerFn({ method: "POST" })
     const { data: members } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, created_at, archived_at").eq("organization_id", org).order("created_at");
     const { data: invites } = await supabaseAdmin.from("invitations").select("id, email, phone, full_name, role, expires_at, used_at, revoked_at, created_at").eq("organization_id", org).order("created_at", { ascending: false }).limit(100);
     const ids = (members ?? []).map((m) => m.user_id);
-    const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
+    const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, phone").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
     const emails: Record<string, string> = {};
     for (const id of ids) { const { data: u } = await supabaseAdmin.auth.admin.getUserById(id); if (u.user?.email) emails[id] = u.user.email; }
     return {
-      members: (members ?? []).map((m) => ({ ...m, email: emails[m.user_id] ?? "", full_name: profiles?.find((p) => p.id === m.user_id)?.full_name ?? null })),
+      members: (members ?? []).map((m) => ({ ...m, email: emails[m.user_id] ?? "", full_name: profiles?.find((p) => p.id === m.user_id)?.full_name ?? null, phone: profiles?.find((p) => p.id === m.user_id)?.phone ?? null })),
       invites: invites ?? [],
     };
   });
