@@ -64,6 +64,13 @@
       "when": 1793313654825,
       "tag": "0008_invitation_token_hash",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793320490632,
+      "tag": "0009_checklist_attachments_profile_phone",
+      "breakpoints": true
     }
   ]
 }
