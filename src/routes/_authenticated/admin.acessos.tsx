@@ -80,7 +80,7 @@ function Page() {
           {channel === "whatsapp" && <Field id="ip" label="Telefone (com DDD)"><Input id="ip" type="tel" inputMode="tel" placeholder="(11) 98765-4321" className="h-11" value={phone} onChange={(e) => setPhone(e.target.value)} required /></Field>}
           <Field id="ie" label="E-mail (usado para entrar)"><Input id="ie" type="email" className="h-11" value={email} onChange={(e) => setEmail(e.target.value)} required /></Field>
           <Field id="ir" label="Papel"><select id="ir" className={selectClass} value={role} onChange={(e) => setRole(e.target.value as AppRole)}>{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select></Field>
-          <Button type="submit" className="min-h-11" disabled={inv.isPending || !email || (channel === "whatsapp" && !phone)}>{inv.isPending ? "Gerando…" : channel === "whatsapp" ? "Convidar pelo WhatsApp" : "Gerar e copiar link"}</Button>
+          <Button type="submit" className="min-h-11" disabled={inv.isPending || !email || (channel === "whatsapp" && !phone)}>{inv.isPending ? "Enviando…" : channel === "whatsapp" ? "Convidar pelo WhatsApp" : "Enviar link"}</Button>
         </form>
       </Card>
       {q.isPending ? <LoadingRows /> : q.isError ? <ErrorState error={q.error} onRetry={() => q.refetch()} /> : (
