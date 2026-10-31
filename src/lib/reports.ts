@@ -52,7 +52,7 @@ async function pdfDoc() {
     cells.forEach((c, i) => { let s = clean(c); const f = b ? bold : font; while (s && f.widthOfTextAtSize(s, 8) > widths[i]! - 4) s = s.slice(0, -1); page.drawText(s, { x, y, size: 8, font: f }); x += widths[i]!; });
     y -= 13;
   };
-  return { doc, text, row, gap: (n = 8) => { y -= n; } };
+  return { doc, text, row, gap: (n = 8) => { y -= n; }, newPage: () => { page = doc.addPage([595, 842]); y = 800; } };
 }
 
 export async function exportPdf(kind: string, title: string, cols: Column[], rows: Record<string, unknown>[], params: Record<string, unknown>, subtitle = "") {
@@ -92,4 +92,48 @@ export async function downloadWoReport(d: WoData, withCosts: boolean) {
   const bytes = await p.doc.save();
   await supabase.rpc("log_export", { p_kind: "laudo_os.pdf", p_params: { work_order_id: w.id } });
   save(new Blob([bytes as BlobPart], { type: "application/pdf" }), `laudo-${w.number}.pdf`);
+}
+
+type WoSheet = {
+  id: string; number: string; opened_at: string; due_date: string | null; closed_at: string | null; status: WoStatus; priority: string; type: keyof typeof WO_TYPE_LABEL;
+  description: string; diagnosis: string | null; solution: string | null; requester_name: string | null; requester_sector: string | null; consultant: string | null; contact: string | null;
+  fleet_number: string | null; equipment_year: number | null; equipment_kind: string | null; technician_name: string | null; notes: string | null; hour_meter_reading: number | null;
+  items: unknown; services_amount: number | null;
+  customers: { legal_name: string } | null; equipment: { serial: string; manufacturer: string; model: string } | null;
+};
+
+/** OS no modelo Nobre (2 páginas): dados, defeito, diagnóstico, andamento e tabela de peças/serviços. */
+export async function downloadWoSheet(w: WoSheet, techs: string) {
+  const { woTotals, itemTotal } = await import("@/lib/wo-items");
+  const items = (Array.isArray(w.items) ? w.items : []) as import("@/lib/wo-items").WoItem[];
+  const p = await pdfDoc(); const v = (s: unknown) => (s === null || s === undefined || s === "" ? "—" : String(s));
+  const pair = (a: string, b: string) => p.row([a, b], [160, 355]);
+  p.gap(6); p.text("NOBRE EMPILHADEIRAS — MANUTENÇÃO DE EMPILHADEIRAS", { b: true, size: 10 }); p.text(`ORDEM DE SERVIÇO ${w.number}`, { b: true, size: 13 }); p.gap(4);
+  p.row(["Nº da OS", "Data de entrada", "Prazo previsto", "Data de conclusão"], [129, 129, 129, 128], true);
+  p.row([w.number, formatDate(w.opened_at), w.due_date ? formatDate(w.due_date) : "—", w.closed_at ? formatDate(w.closed_at) : "—"], [129, 129, 129, 128]); p.gap(6);
+  p.text("DADOS DO SOLICITANTE / CLIENTE", { b: true, size: 10 });
+  pair("Cliente / empresa", v(w.customers?.legal_name)); pair("Responsável pela solicitação", v(w.requester_name)); pair("Setor", v(w.requester_sector));
+  pair("Consultor / contato", v(w.consultant)); pair("Telefone / e-mail", v(w.contact)); pair("Prioridade", v(w.priority)); p.gap(6);
+  p.text("IDENTIFICAÇÃO DA EMPILHADEIRA", { b: true, size: 10 });
+  pair("Identificação / frota", v(w.fleet_number)); pair("Marca / modelo", `${v(w.equipment?.manufacturer)} ${v(w.equipment?.model)}`); pair("Ano", v(w.equipment_year));
+  pair("Horímetro", w.hour_meter_reading !== null ? `${formatNumber(w.hour_meter_reading)} h` : "—"); pair("Chassi / nº de série", v(w.equipment?.serial));
+  pair("Tipo de equipamento", v(w.equipment_kind)); pair("Tipo de manutenção", WO_TYPE_LABEL[w.type]); p.gap(6);
+  for (const [t, x] of [["SOLICITAÇÃO / DEFEITO RELATADO", w.description], ["DIAGNÓSTICO TÉCNICO", w.diagnosis], ["SERVIÇOS EXECUTADOS / RECOMENDAÇÕES", w.solution]] as const) { p.text(t, { b: true, size: 10 }); p.text(v(x)); p.gap(6); }
+  p.text("ANDAMENTO", { b: true, size: 10 }); p.text(`Situação atual: ${WO_STATUS_LABEL[w.status]}`);
+  pair("Técnico responsável", w.technician_name || techs || "—"); p.gap(30);
+  p.text("_______________________________          _______________________________"); p.text("Técnico responsável                                         Responsável do cliente / aprovação");
+  p.newPage();
+  p.text("NOBRE EMPILHADEIRAS — ORDEM DE SERVIÇO", { b: true, size: 11 }); p.text(`Nº da OS: ${w.number} · Cliente / equipamento: ${v(w.customers?.legal_name)} / ${v(w.equipment?.serial)}`); p.gap(6);
+  p.text("PEÇAS, MATERIAIS E SERVIÇOS", { b: true, size: 10 });
+  const cw = [55, 200, 60, 40, 80, 80];
+  p.row(["Tipo", "Descrição da peça / serviço", "Código", "Qtd.", "Valor unit.", "Total"], cw, true);
+  for (const i of items) p.row([i.kind === "servico" ? "Serviço" : "Peça", i.description, i.code || "—", formatNumber(i.qty), formatBRL(i.unit), formatBRL(itemTotal(i))], cw);
+  if (!items.length) p.text("Nenhum item lançado.");
+  const t = woTotals(items, Number(w.services_amount ?? 0)); p.gap(6);
+  p.text(`Subtotal peças: ${formatBRL(t.parts)} · Serviços: ${formatBRL(t.services)} · Total geral: ${formatBRL(t.total)}`, { b: true }); p.gap(6);
+  p.text("OBSERVAÇÕES / PENDÊNCIAS", { b: true, size: 10 }); p.text(v(w.notes)); p.gap(30);
+  p.text("_____________________     _____________________     _____________________"); p.text("Solicitado por                    Executado por                       Aprovado / data");
+  const bytes = await p.doc.save();
+  await supabase.rpc("log_export", { p_kind: "os_modelo.pdf", p_params: { work_order_id: w.id } });
+  save(new Blob([bytes as BlobPart], { type: "application/pdf" }), `${w.number}.pdf`);
 }
