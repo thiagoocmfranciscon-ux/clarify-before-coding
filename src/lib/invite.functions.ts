@@ -49,14 +49,14 @@ export const acceptInviteWithPassword = createServerFn({ method: "POST" })
       }
       const now = new Date().toISOString();
       const { error: me } = await supabaseAdmin.from("organization_members").upsert(
-        { organization_id: inv.organization_id, user_id: userId, role: inv.role, active: true, archived_at: null, archived_by: null, created_by: inv.created_by, updated_at: now } as never,
+        { organization_id: inv.organization_id, user_id: userId, role: inv.role, active: false, approved_at: null, approved_by: null, archived_at: null, archived_by: null, created_by: inv.created_by, updated_at: now } as never,
         { onConflict: "organization_id,user_id" },
       );
       if (me) throw new Error("member_failed");
       await supabaseAdmin.from("profiles").upsert({ id: userId, ...(inv.full_name ? { full_name: inv.full_name } : {}), must_change_password: false } as never, { onConflict: "id" });
       await supabaseAdmin.from("invitations").update({ used_by: userId }).eq("id", inv.id);
       await supabaseAdmin.from("audit_events").insert({ organization_id: inv.organization_id, actor_id: userId, action: "invite_accepted", entity: "invitations", entity_id: inv.id, changes: { role: inv.role } });
-      return { ok: true, email: inv.email };
+      return { ok: true, email: inv.email, pending: true };
     } catch (e) {
       // Devolve o convite para poder tentar de novo.
       await supabaseAdmin.from("invitations").update({ used_at: null }).eq("id", inv.id);
