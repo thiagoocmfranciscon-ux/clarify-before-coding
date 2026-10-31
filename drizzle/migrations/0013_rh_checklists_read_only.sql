@@ -1,0 +1,2 @@
+CREATE POLICY rh_checklists_read_only ON public.checklists AS RESTRICTIVE FOR ALL TO authenticated USING (public.my_role()::text <> 'leitura' OR (SELECT public.my_role()) IS NOT NULL) WITH CHECK (public.my_role()::text <> 'leitura');
+ALTER POLICY rh_checklists_read_only ON public.checklists USING (true) WITH CHECK (public.my_role()::text <> 'leitura');

@@ -9,6 +9,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Sistema interno de manutenção, ordens de serviço, estoque e frotas." },
       { property: "og:title", content: "Empilha Nobre — Gestão de Manutenção" },
       { property: "og:description", content: "Sistema interno de manutenção, ordens de serviço, estoque e frotas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   beforeLoad: async () => {
