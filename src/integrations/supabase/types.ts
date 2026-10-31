@@ -153,6 +153,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_id: string | null
+          customer_name: string | null
           customer_notes: string | null
           customer_signer: string | null
           equipment_id: string | null
@@ -187,6 +188,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          customer_name?: string | null
           customer_notes?: string | null
           customer_signer?: string | null
           equipment_id?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          customer_name?: string | null
           customer_notes?: string | null
           customer_signer?: string | null
           equipment_id?: string | null
@@ -653,6 +656,8 @@ export type Database = {
       organization_members: {
         Row: {
           active: boolean
+          approved_at: string | null
+          approved_by: string | null
           archived_at: string | null
           archived_by: string | null
           created_at: string
@@ -665,6 +670,8 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           archived_at?: string | null
           archived_by?: string | null
           created_at?: string
@@ -677,6 +684,8 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           archived_at?: string | null
           archived_by?: string | null
           created_at?: string

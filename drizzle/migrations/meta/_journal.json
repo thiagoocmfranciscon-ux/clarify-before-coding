@@ -71,6 +71,13 @@
       "when": 1793320490632,
       "tag": "0009_checklist_attachments_profile_phone",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793413355697,
+      "tag": "0010_approval_and_checklist_free",
+      "breakpoints": true
     }
   ]
 }
