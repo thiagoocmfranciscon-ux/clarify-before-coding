@@ -2,8 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { hashInviteToken, inviteUrl, newInviteToken } from "./invite-token";
+import { memberPhoneSchema } from "./member-phone";
 
-const roleEnum = z.enum(["admin", "ceo", "diretor_comercial", "gestor_manutencao", "almoxarifado", "tecnico"]);
+const roleEnum = z.enum(["admin", "ceo", "diretor_comercial", "gestor_manutencao", "almoxarifado", "tecnico", "rh"]);
 const FULL = ["admin", "ceo", "diretor_comercial", "gestor_manutencao"] as const;
 const isFull = (r: string) => (FULL as readonly string[]).includes(r);
 
@@ -121,6 +122,20 @@ export const listMembers = createServerFn({ method: "POST" })
       members: (members ?? []).map((m) => ({ ...m, email: emails[m.user_id] ?? "", full_name: profiles?.find((p) => p.id === m.user_id)?.full_name ?? null, phone: profiles?.find((p) => p.id === m.user_id)?.phone ?? null })),
       invites: invites ?? [],
     };
+  });
+
+export const updateMemberPhone = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ memberId: z.string().uuid(), phone: memberPhoneSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const org = await requireAdmin(context.supabase as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: member, error: memberError } = await supabaseAdmin.from("organization_members").select("user_id").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
+    if (memberError || !member) throw new Error("Usuário não encontrado nesta organização.");
+    const { data: profile, error } = await supabaseAdmin.from("profiles").update({ phone: data.phone || null }).eq("id", member.user_id).select("id").maybeSingle();
+    if (error || !profile) throw new Error("Falha ao salvar telefone.");
+    await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action: "user_phone_updated", entity: "profiles", entity_id: member.user_id, changes: { phone: data.phone || null } });
+    return { ok: true };
   });
 
 /** Exclui definitivamente um usuário já arquivado (conta e acesso). O histórico continua. */
