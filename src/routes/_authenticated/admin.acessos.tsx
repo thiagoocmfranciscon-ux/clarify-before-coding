@@ -11,7 +11,7 @@ import { useMe } from "@/hooks/use-membership";
 import { ASSIGNABLE_ROLES, PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
-import { deleteInvitation, inviteUser, listMembers, resendInvite, updateMember } from "@/lib/admin.functions";
+import { deleteInvitation, deleteMember, inviteUser, listMembers, resendInvite, updateMember } from "@/lib/admin.functions";
 import { memberStatus } from "@/lib/domain";
 import { Archive, ArrowLeft, Copy, Link2, Trash2 } from "lucide-react";
 import { WhatsAppIcon, waLink } from "@/components/icons";
@@ -28,7 +28,8 @@ const ROLES = ASSIGNABLE_ROLES;
 
 function Page() {
   const me = useMe(); const qc = useQueryClient();
-  const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const remove = useServerFn(deleteInvitation); const update = useServerFn(updateMember); const resend = useServerFn(resendInvite);
+  const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const remove = useServerFn(deleteInvitation); const update = useServerFn(updateMember); const resend = useServerFn(resendInvite); const removeMember = useServerFn(deleteMember);
+  const [delMember, setDelMember] = useState<{ id: string; name: string } | null>(null);
   const [email, setEmail] = useState(""); const [channel, setChannel] = useState<"email" | "whatsapp">("email"); const [phone, setPhone] = useState(""); const [fullName, setFullName] = useState(""); const [role, setRole] = useState<AppRole>("tecnico");
   const [showArchived, setShowArchived] = useState(false);
   const [confirm, setConfirm] = useState<{ id: string; archive: boolean } | null>(null);
@@ -62,6 +63,7 @@ function Page() {
     onError: (e) => toast.error(friendlyError(e)),
   });
   const upd = useMutation({ mutationFn: (d: { memberId: string; role?: AppRole; active?: boolean; archive?: boolean }) => update({ data: d }), onSuccess: (_r, d) => done(d.archive === true ? "Usuário arquivado" : d.archive === false ? "Usuário restaurado. Reative o acesso quando quiser." : "Acesso atualizado"), onError: (e) => toast.error(friendlyError(e)) });
+  const delM = useMutation({ mutationFn: (id: string) => removeMember({ data: { memberId: id } }), onSuccess: () => done("Usuário excluído"), onError: (e) => toast.error(friendlyError(e)) });
   const del = useMutation({ mutationFn: (id: string) => remove({ data: { id } }), onSuccess: () => done("Convite excluído"), onError: (e) => toast.error(friendlyError(e)) });
   const [delId, setDelId] = useState<string | null>(null);
   if (!PERM.admin(me.role)) return <NoPermission />;
@@ -121,15 +123,17 @@ function Page() {
                       <td className={td}>{ROLE_LABEL[m.role as AppRole]}</td>
                       <td className={td}>{m.archived_at ? formatDateTime(m.archived_at) : "—"}</td>
                       <td className={td}><Pill tone="neutral">Arquivado</Pill></td>
-                      <td className={td}><Button size="sm" variant="outline" onClick={() => setConfirm({ id: m.id, archive: false })}>Restaurar</Button></td>
+                      <td className={td}><div className="flex flex-wrap gap-1"><Button size="sm" variant="outline" onClick={() => setConfirm({ id: m.id, archive: false })}>Restaurar</Button><Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={delM.isPending} onClick={() => setDelMember({ id: m.id, name: m.full_name ?? m.email })}><Trash2 className="mr-1 h-4 w-4" />Excluir</Button></div></td>
                     </tr>
                   ))}
                 </Table>
               ) : (
-                <Table head={["Nome", "E-mail", "Papel", "Situação", ""]}>
+                <Table head={["Nome", "Telefone", "E-mail", "Papel", "Situação", ""]}>
                   {current.map((m) => (
                     <tr key={m.id}>
-                      <td className={td}><div>{m.full_name ?? "—"}</div>{m.phone && <div className="text-xs text-muted-foreground">{m.phone}</div>}</td><td className={td}>{m.email}</td>
+                      <td className={td}>{m.full_name ?? "—"}</td>
+                      <td className={td}>{m.phone ? <div className="flex items-center gap-2 whitespace-nowrap"><span>{m.phone}</span>{waLink(m.phone, "") && <a href={waLink(m.phone, "")!.split("?")[0]} target="_blank" rel="noopener noreferrer" aria-label={`Abrir WhatsApp de ${m.full_name ?? m.email}`} className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-success hover:bg-muted"><WhatsAppIcon /></a>}</div> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className={td}>{m.email}</td>
                       <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
                       <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>
                       <td className={td}>{m.user_id !== me.userId && (
@@ -160,6 +164,18 @@ function Page() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <AlertDialog open={!!delMember} onOpenChange={(o) => !o && setDelMember(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Excluir {delMember?.name} definitivamente?</AlertDialogTitle>
+                <AlertDialogDescription>A conta e o acesso são apagados e não podem ser recuperados. As OS e o histórico de auditoria continuam.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { if (delMember) delM.mutate(delMember.id); setDelMember(null); }}>Excluir usuário</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <h2 className="mb-2 mt-6 text-lg font-semibold">Convites</h2>
           <Table head={["E-mail", "Telefone", "Papel", "Enviado", "Situação", ""]}>
             {q.data.invites.map((i) => {
@@ -167,7 +183,7 @@ function Page() {
               return (
                 <tr key={i.id}><td className={td}>{i.full_name ? <><div className="font-medium">{i.full_name}</div><div className="text-xs text-muted-foreground">{i.email}</div></> : i.email}</td><td className={td}>{i.phone ?? "—"}</td><td className={td}>{ROLE_LABEL[i.role as AppRole]}</td><td className={td}>{formatDateTime(i.created_at)}</td>
                   <td className={td}><Pill tone={st === "Pendente" ? "warning" : st === "Usado" ? "success" : "neutral"}>{st}</Pill></td>
-                  <td className={td}>{st !== "Usado" && (
+                  <td className={td}>{(
                     <div className="flex flex-wrap gap-1">
                       {(st === "Pendente" || st === "Expirado") && <>
                         <Button size="sm" variant="outline" disabled={rs.isPending} onClick={() => rs.mutate({ id: i.id, via: "copy" })}><Copy className="mr-1 h-4 w-4" />Gerar novo link</Button>
