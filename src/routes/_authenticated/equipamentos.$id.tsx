@@ -10,6 +10,7 @@ import { ArchivedToggle, CrudDialog, Table, td, useArchive, type FieldDef } from
 import { equipmentFields } from "@/components/fields";
 import { AttachmentsPanel } from "@/components/attachments-panel";
 import { NewWorkOrderDialog } from "@/components/wo-new";
+import { DeleteEquipmentButton } from "@/components/equipment-delete";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMe } from "@/hooks/use-membership";
@@ -70,6 +71,7 @@ function Page() {
           {mgr && <Button className="min-h-11" onClick={() => setNewWo(true)}><Plus className="mr-1 h-4 w-4" />Abrir OS</Button>}
           {mgr && <Button variant="outline" className="min-h-11" onClick={() => setEdit(true)}>Editar</Button>}
           {mgr && <Button variant="outline" className="min-h-11" onClick={() => arch.mutate({ row: e, archive: !e.archived_at, userId: me.userId })}>{e.archived_at ? "Restaurar" : "Arquivar"}</Button>}
+          {mgr && <DeleteEquipmentButton id={e.id} serial={e.serial} goBack size="default" />}
         </>} />
       <div className="grid gap-4 lg:grid-cols-3">
         <Card>
