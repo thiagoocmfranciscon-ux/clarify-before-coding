@@ -132,7 +132,7 @@ function Page() {
                   {current.map((m) => (
                     <tr key={m.id}>
                       <td className={td}>{m.full_name ?? "—"}</td>
-                      <td className={td}>{m.phone ? <div className="flex items-center gap-2 whitespace-nowrap"><span>{m.phone}</span>{waLink(m.phone, "") && <a href={waLink(m.phone, "")!.split("?")[0]} target="_blank" rel="noopener noreferrer" aria-label={`Abrir WhatsApp de ${m.full_name ?? m.email}`} className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-success hover:bg-muted"><WhatsAppIcon /></a>}</div> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className={td}>{m.phone ? <div className="flex items-center gap-2 whitespace-nowrap"><span>{m.phone}</span>{waLink(m.phone) && <a href={waLink(m.phone)!} target="_blank" rel="noopener noreferrer" aria-label={`Abrir WhatsApp de ${m.full_name ?? m.email}`} className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-success hover:bg-muted"><WhatsAppIcon /></a>}</div> : <span className="text-muted-foreground">—</span>}</td>
                       <td className={td}>{m.email}</td>
                       <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
                       <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>
