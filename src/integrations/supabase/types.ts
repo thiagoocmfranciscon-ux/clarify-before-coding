@@ -2038,6 +2038,7 @@ export type Database = {
         | "diretor_comercial"
         | "gestor_manutencao"
         | "almoxarifado"
+        | "rh"
       stock_mov_type:
         | "abertura"
         | "entrada"
@@ -2192,6 +2193,7 @@ export const Constants = {
         "diretor_comercial",
         "gestor_manutencao",
         "almoxarifado",
+        "rh",
       ],
       stock_mov_type: [
         "abertura",

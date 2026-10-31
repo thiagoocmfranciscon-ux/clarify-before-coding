@@ -85,6 +85,20 @@
       "when": 1793416079672,
       "tag": "0011_os_manual_model_and_deletes",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793417089220,
+      "tag": "0012_rh_read_only_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793417154348,
+      "tag": "0013_rh_checklists_read_only",
+      "breakpoints": true
     }
   ]
 }

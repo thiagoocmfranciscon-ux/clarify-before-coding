@@ -167,12 +167,12 @@ export function NewWorkOrderDialog({ open, onOpenChange, parentId, preset }: { o
           <Section title="Peças, materiais e serviços">
             <div className="space-y-2">
               {items.map((it, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-2 sm:grid-cols-[110px_1fr_100px_70px_110px_100px_40px] sm:items-center">
+                <div key={i} className="grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-2 lg:grid-cols-[100px_minmax(100px,1fr)_90px_100px_120px_90px_40px] lg:items-end">
                   <select className={`${selectClass} h-10`} value={it.kind} onChange={(e) => setItem(i, { kind: e.target.value as WoItem["kind"] })} aria-label="Tipo"><option value="peca">Peça</option><option value="servico">Serviço</option></select>
                   <Input className="h-10" placeholder="Descrição" value={it.description} onChange={(e) => setItem(i, { description: e.target.value })} aria-label="Descrição" />
-                  <Input className="h-10" placeholder="Código" value={it.code} onChange={(e) => setItem(i, { code: e.target.value })} aria-label="Código" />
-                  <Input className="h-10" inputMode="decimal" placeholder="Qtd." value={String(it.qty)} onChange={(e) => setItem(i, { qty: parseDecimal(e.target.value) ?? 0 })} aria-label="Quantidade" />
-                  <Input className="h-10" inputMode="decimal" placeholder="Valor unit." value={String(it.unit)} onChange={(e) => setItem(i, { unit: parseDecimal(e.target.value) ?? 0 })} aria-label="Valor unitário" />
+                  <Field id={`item-code-${i}`} label="Código"><Input id={`item-code-${i}`} className="h-10" placeholder="Código" title="Código de identificação da peça ou serviço" value={it.code} onChange={(e) => setItem(i, { code: e.target.value })} /></Field>
+                  <Field id={`item-qty-${i}`} label="Quantidade"><Input id={`item-qty-${i}`} className="h-10" inputMode="decimal" placeholder="Qtd." title="Número de unidades da peça ou serviço" value={String(it.qty)} onChange={(e) => setItem(i, { qty: parseDecimal(e.target.value) ?? 0 })} /></Field>
+                  <Field id={`item-unit-${i}`} label="Valor unit. (R$)"><Input id={`item-unit-${i}`} className="h-10" inputMode="decimal" placeholder="Valor unit." title="Preço em reais de cada unidade" value={String(it.unit)} onChange={(e) => setItem(i, { unit: parseDecimal(e.target.value) ?? 0 })} /></Field>
                   <div className="text-right text-sm font-medium">{formatBRL(itemTotal(it))}</div>
                   <Button type="button" size="icon" variant="ghost" onClick={() => setItems((a) => a.filter((_, j) => j !== i))} aria-label="Remover linha"><Trash2 className="h-4 w-4" /></Button>
                 </div>

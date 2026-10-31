@@ -29,7 +29,7 @@ export const createAttachmentUpload = createServerFn({ method: "POST" })
       ok = !!v && !!w && !["encerrada", "cancelada"].includes(w.status) && role !== "leitura" && role !== "almoxarife";
     } else if (data.entityType === "checklist") {
       const { data: row } = await sb.from("checklists").select("id").eq("id", data.entityId).maybeSingle();
-      ok = !!row;
+      ok = !!row && role !== "leitura";
     } else {
       const table = data.entityType === "equipment" ? "equipment" : "vehicles";
       const { data: row } = await sb.from(table).select("id").eq("id", data.entityId).maybeSingle();

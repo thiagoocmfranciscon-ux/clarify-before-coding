@@ -11,7 +11,8 @@ import { useMe } from "@/hooks/use-membership";
 import { ASSIGNABLE_ROLES, PERM, ROLE_LABEL, type AppRole } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
-import { deleteInvitation, deleteMember, inviteUser, listMembers, resendInvite, updateMember } from "@/lib/admin.functions";
+import { deleteInvitation, deleteMember, inviteUser, listMembers, resendInvite, updateMember, updateMemberPhone } from "@/lib/admin.functions";
+import { MemberPhoneEditor } from "@/components/member-phone-editor";
 import { memberStatus } from "@/lib/domain";
 import { Archive, ArrowLeft, Copy, Link2, Trash2 } from "lucide-react";
 import { WhatsAppIcon, waLink } from "@/components/icons";
@@ -20,7 +21,7 @@ const waText = (name: string | null | undefined, link: string) => `Olá${name ? 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/acessos")({
-  head: () => ({ meta: [{ title: "Administração de Acessos — Empilha Nobre" }, { name: "description", content: "Convites, papéis e revogação de acesso." }, { property: "og:title", content: "Administração de Acessos — Empilha Nobre" }, { property: "og:description", content: "Convites e papéis." }] }),
+  head: () => ({ meta: [{ title: "Administração de Acessos — Empilha Nobre" }, { name: "description", content: "Convites, papéis e revogação de acesso." }, { property: "og:title", content: "Administração de Acessos — Empilha Nobre" }, { property: "og:description", content: "Convites e papéis." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Page,
 });
 
@@ -30,6 +31,12 @@ function Page() {
   const me = useMe(); const qc = useQueryClient();
   const list = useServerFn(listMembers); const invite = useServerFn(inviteUser); const remove = useServerFn(deleteInvitation); const update = useServerFn(updateMember); const resend = useServerFn(resendInvite); const removeMember = useServerFn(deleteMember);
   const [delMember, setDelMember] = useState<{ id: string; name: string } | null>(null);
+  const savePhone = useServerFn(updateMemberPhone);
+  const phoneUpdate = useMutation({
+    mutationFn: (data: { memberId: string; phone: string }) => savePhone({ data }),
+    onSuccess: () => { done("Telefone atualizado"); qc.invalidateQueries({ queryKey: ["membership"] }); },
+    onError: (error) => toast.error(friendlyError(error)),
+  });
   const [email, setEmail] = useState(""); const [channel, setChannel] = useState<"email" | "whatsapp">("email"); const [phone, setPhone] = useState(""); const [fullName, setFullName] = useState(""); const [role, setRole] = useState<AppRole>("tecnico");
   const [showArchived, setShowArchived] = useState(false);
   const [confirm, setConfirm] = useState<{ id: string; archive: boolean } | null>(null);
@@ -132,7 +139,7 @@ function Page() {
                   {current.map((m) => (
                     <tr key={m.id}>
                       <td className={td}>{m.full_name ?? "—"}</td>
-                      <td className={td}>{m.phone ? <div className="flex items-center gap-2 whitespace-nowrap"><span>{m.phone}</span>{waLink(m.phone) && <a href={waLink(m.phone)!} target="_blank" rel="noopener noreferrer" aria-label={`Abrir WhatsApp de ${m.full_name ?? m.email}`} className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-success hover:bg-muted"><WhatsAppIcon /></a>}</div> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className={td}><MemberPhoneEditor phone={m.phone} name={m.full_name ?? m.email} busy={phoneUpdate.isPending} onSave={async (phone) => { await phoneUpdate.mutateAsync({ memberId: m.id, phone }); }} /></td>
                       <td className={td}>{m.email}</td>
                       <td className={td}>{m.user_id === me.userId ? ROLE_LABEL[m.role as AppRole] : <select className={`${selectClass} h-9`} value={m.role} onChange={(e) => upd.mutate({ memberId: m.id, role: e.target.value as AppRole })} aria-label="Papel">{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select>}</td>
                       <td className={td}>{m.active ? <Pill tone="success">Ativo</Pill> : <Pill tone="danger">Revogado</Pill>}</td>

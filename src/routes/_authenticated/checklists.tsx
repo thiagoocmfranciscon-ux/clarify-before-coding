@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/checklists")({
   head: () => ({ meta: [
     { title: "Checklists — Empilha Nobre" }, { name: "description", content: "Checklists de entrega e retorno de empilhadeiras." },
     { property: "og:title", content: "Checklists — Empilha Nobre" }, { property: "og:description", content: "Entrega e retorno de máquinas." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
   component: Page,
 });
@@ -38,6 +39,7 @@ type Row = {
 };
 
 function Page() {
+  const me = useMe(); const readOnly = me.role === "leitura";
   const { tipo } = Route.useSearch(); const navigate = useNavigate({ from: "/checklists" });
   const [editing, setEditing] = useState<Row | "new" | null>(null);
   const [delId, setDelId] = useState<string | null>(null);
@@ -70,7 +72,7 @@ function Page() {
   return (
     <>
       <PageHeader title="Checklists" description="Entrega e retorno de máquinas, item por item."
-        actions={<Button className="min-h-11" onClick={() => setEditing("new")} disabled={!tpl.data}><Plus className="mr-1 h-4 w-4" />Novo checklist</Button>} />
+        actions={!readOnly && <Button className="min-h-11" onClick={() => setEditing("new")} disabled={!tpl.data}><Plus className="mr-1 h-4 w-4" />Novo checklist</Button>} />
       <div role="tablist" aria-label="Tipo de máquina" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border bg-card p-1 sm:flex sm:overflow-x-auto [scrollbar-width:none]">
         {MACHINE_TYPES.map((m) => (
           <button key={m.key} role="tab" aria-selected={tipo === m.key} onClick={() => navigate({ search: { tipo: m.key } })}
@@ -80,7 +82,7 @@ function Page() {
         ))}
       </div>
       {list.isPending ? <LoadingRows /> : list.isError ? <ErrorState error={list.error} onRetry={() => list.refetch()} /> : list.data.length === 0 ? (
-        <EmptyState title="Nenhum checklist ainda" description="Registre a entrega ou o retorno de uma máquina." action={<Button onClick={() => setEditing("new")} disabled={!tpl.data}><Plus className="mr-1 h-4 w-4" />Novo checklist</Button>} />
+        <EmptyState title="Nenhum checklist ainda" action={!readOnly && <Button onClick={() => setEditing("new")} disabled={!tpl.data}><Plus className="mr-1 h-4 w-4" />Novo checklist</Button>} />
       ) : (
         <Table head={["Data", "Tipo", "Cliente", "Nº frota", "Responsável", "Itens ruins", ""]}>
           {list.data.map((r) => (
@@ -92,7 +94,7 @@ function Page() {
               <td className={td}>{r.responsible_name || "—"}</td>
               <td className={td}>{r.bad_count > 0 ? <Pill tone="danger">{r.bad_count}</Pill> : <Pill tone="success">0</Pill>}</td>
               <td className={td}><div className="flex gap-1"><Button size="sm" variant="ghost">Abrir</Button>
-                <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" aria-label="Excluir checklist" onClick={(e) => { e.stopPropagation(); setDelId(r.id); }}><Trash2 className="h-4 w-4" /></Button></div></td>
+                {!readOnly && <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" aria-label="Excluir checklist" onClick={(e) => { e.stopPropagation(); setDelId(r.id); }}><Trash2 className="h-4 w-4" /></Button>}</div></td>
             </tr>
           ))}
         </Table>
@@ -124,7 +126,7 @@ function ChecklistDialog({ tipo, template, row, onClose }: { tipo: MachineType; 
   }));
   const [answers, setAnswers] = useState<Record<string, Answer>>(row?.answers ?? {});
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
-  const canEdit = !row || row.created_by === me.userId || PERM.manage(me.role);
+  const canEdit = me.role !== "leitura" && (!row || row.created_by === me.userId || PERM.manage(me.role));
 
   const pending = unanswered(items, answers);
   const bad = countBad(items, answers);
