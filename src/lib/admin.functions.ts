@@ -59,9 +59,9 @@ export const deleteInvitation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: gone, error } = await supabaseAdmin.from("invitations").delete().eq("id", data.id).eq("organization_id", org).is("used_at", null).select("email, role");
+    const { data: gone, error } = await supabaseAdmin.from("invitations").delete().eq("id", data.id).eq("organization_id", org).select("email, role");
     if (error) throw new Error("Falha ao excluir convite");
-    if (!gone?.length) throw new Error("Convites já usados não podem ser excluídos.");
+    if (!gone?.length) throw new Error("Convite não encontrado.");
     await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action: "invite_deleted", entity: "invitations", entity_id: data.id, changes: { email: gone[0]!.email, role: gone[0]!.role } });
     return { ok: true };
   });
@@ -121,4 +121,26 @@ export const listMembers = createServerFn({ method: "POST" })
       members: (members ?? []).map((m) => ({ ...m, email: emails[m.user_id] ?? "", full_name: profiles?.find((p) => p.id === m.user_id)?.full_name ?? null, phone: profiles?.find((p) => p.id === m.user_id)?.phone ?? null })),
       invites: invites ?? [],
     };
+  });
+
+/** Exclui definitivamente um usuário já arquivado (conta e acesso). O histórico continua. */
+export const deleteMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ memberId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const org = await requireAdmin(context.supabase as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: m } = await supabaseAdmin.from("organization_members").select("id, user_id, role, archived_at").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
+    if (!m) throw new Error("Usuário não encontrado");
+    if (m.user_id === context.userId) throw new Error("Você não pode excluir a própria conta.");
+    if (!m.archived_at) throw new Error("Arquive o usuário antes de excluir.");
+    const { data: prof } = await supabaseAdmin.from("profiles").select("full_name").eq("id", m.user_id).maybeSingle();
+    const { data: u } = await supabaseAdmin.auth.admin.getUserById(m.user_id);
+    await supabaseAdmin.from("technicians").update({ user_id: null }).eq("user_id", m.user_id);
+    const { error: e1 } = await supabaseAdmin.from("organization_members").delete().eq("id", m.id);
+    if (e1) throw new Error("Falha ao excluir o acesso");
+    const { error: e2 } = await supabaseAdmin.auth.admin.deleteUser(m.user_id);
+    if (e2) throw new Error("Falha ao excluir a conta");
+    await supabaseAdmin.from("audit_events").insert({ organization_id: org, actor_id: context.userId, action: "user_deleted", entity: "organization_members", entity_id: m.id, changes: { nome: prof?.full_name ?? null, email: u.user?.email ?? null, role: m.role } });
+    return { ok: true };
   });
