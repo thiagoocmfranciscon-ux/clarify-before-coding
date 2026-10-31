@@ -87,8 +87,25 @@ function Page() {
         <>
           {(() => {
             const archived = q.data.members.filter((m) => memberStatus(m) === "archived");
-            const current = q.data.members.filter((m) => memberStatus(m) !== "archived");
+            const pending = q.data.members.filter((m) => memberStatus(m) === "pending");
+            const current = q.data.members.filter((m) => memberStatus(m) === "active" || memberStatus(m) === "revoked");
             return (<>
+              {pending.length > 0 && !showArchived && (
+                <Card className="mb-6 border-warning/50">
+                  <h2 className="mb-3 font-semibold">Aguardando aprovação ({pending.length})</h2>
+                  <ul className="divide-y">
+                    {pending.map((m) => (
+                      <li key={m.id} className="flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div><div className="font-medium">{m.full_name ?? m.email}</div><div className="text-xs text-muted-foreground">{m.email} · {ROLE_LABEL[m.role as AppRole]}</div></div>
+                        <div className="flex gap-2">
+                          <Button size="sm" disabled={upd.isPending} onClick={() => upd.mutate({ memberId: m.id, active: true })}>Aprovar</Button>
+                          <Button size="sm" variant="outline" disabled={upd.isPending} onClick={() => upd.mutate({ memberId: m.id, archive: true })}>Recusar</Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">{showArchived ? "Usuários arquivados" : "Usuários"}</h2>
                 <Button variant="outline" className="min-h-10" onClick={() => setShowArchived((v) => !v)}>

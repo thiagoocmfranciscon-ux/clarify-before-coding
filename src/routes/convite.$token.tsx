@@ -40,12 +40,10 @@ function InvitePage() {
 
   const m = useMutation({
     mutationFn: async () => {
-      const r = await accept({ data: { token, password: pw } });
+      await accept({ data: { token, password: pw } });
       await supabase.auth.signOut().catch(() => {});
-      const { error } = await supabase.auth.signInWithPassword({ email: r.email, password: pw });
-      if (error) throw new Error("Conta criada! Entre com seu e-mail e a senha que você acabou de criar.");
     },
-    onSuccess: () => navigate({ to: "/dashboard", replace: true }),
+    onSuccess: () => { void navigate; },
     onError: (e) => setError(friendlyError(e)),
   });
 
@@ -64,7 +62,13 @@ function InvitePage() {
         <div className="relative mx-auto flex w-fit rounded-2xl bg-card px-5 py-3 shadow-soft"><BrandFull className="h-8" /></div>
       </div>
       <div className="relative z-10 -mt-12 w-[calc(100%-2.5rem)] max-w-md rounded-2xl border bg-card p-6 shadow-soft">
-        {q.isPending ? (
+        {m.isSuccess ? (
+          <div>
+            <h1 className="text-xl font-bold">Cadastro enviado!</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Seu cadastro foi enviado ao Setor Técnico. Você poderá entrar assim que for aprovado.</p>
+            <Button asChild className="mt-6 h-12 w-full"><Link to="/auth">Ir para o login</Link></Button>
+          </div>
+        ) : q.isPending ? (
           <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Abrindo convite…</p>
         ) : q.isError || !d || d.state !== "valid" ? (
           <div>

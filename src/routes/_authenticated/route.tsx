@@ -34,7 +34,7 @@ function AuthLayout() {
           <BrandLockup />
           <h1 className="mt-6 text-xl font-semibold">Acesso não liberado</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {q.isError ? "Não foi possível verificar seu acesso. Tente novamente." : "Sua conta não possui associação ativa com uma organização. Peça um convite à administração."}
+            {q.isError ? "Não foi possível verificar seu acesso. Tente novamente." : "Seu cadastro ainda está aguardando a aprovação do Setor Técnico, ou o acesso foi revogado. Você poderá entrar assim que for aprovado."}
           </p>
           <div className="mt-6 flex gap-2">
             {q.isError && <Button onClick={() => q.refetch()}>Tentar novamente</Button>}

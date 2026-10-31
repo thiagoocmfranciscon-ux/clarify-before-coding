@@ -137,7 +137,8 @@ export const PERM = {
 };
 
 /** Situação do usuário: arquivado tem prioridade sobre ativo/revogado. */
-export function memberStatus(m: { active: boolean; archived_at?: string | null }): "active" | "revoked" | "archived" {
+export function memberStatus(m: { active: boolean; archived_at?: string | null; approved_at?: string | null }): "active" | "revoked" | "archived" | "pending" {
   if (m.archived_at) return "archived";
+  if (!m.active && m.approved_at === null) return "pending";
   return m.active ? "active" : "revoked";
 }
