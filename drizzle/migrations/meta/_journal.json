@@ -78,6 +78,13 @@
       "when": 1793413355697,
       "tag": "0010_approval_and_checklist_free",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793416079672,
+      "tag": "0011_os_manual_model_and_deletes",
+      "breakpoints": true
     }
   ]
 }
