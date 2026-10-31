@@ -167,7 +167,7 @@ export function NewWorkOrderDialog({ open, onOpenChange, parentId, preset }: { o
           <Section title="Peças, materiais e serviços">
             <div className="space-y-2">
               {items.map((it, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-2 sm:grid-cols-[110px_1fr_100px_70px_110px_100px_40px] sm:items-center">
+                <div key={i} className="grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-2 lg:grid-cols-[100px_minmax(100px,1fr)_90px_100px_120px_90px_40px] lg:items-end">
                   <select className={`${selectClass} h-10`} value={it.kind} onChange={(e) => setItem(i, { kind: e.target.value as WoItem["kind"] })} aria-label="Tipo"><option value="peca">Peça</option><option value="servico">Serviço</option></select>
                   <Input className="h-10" placeholder="Descrição" value={it.description} onChange={(e) => setItem(i, { description: e.target.value })} aria-label="Descrição" />
                   <Field id={`item-code-${i}`} label="Código"><Input id={`item-code-${i}`} className="h-10" placeholder="Código" title="Código de identificação da peça ou serviço" value={it.code} onChange={(e) => setItem(i, { code: e.target.value })} /></Field>
