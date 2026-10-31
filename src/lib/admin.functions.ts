@@ -82,7 +82,7 @@ export const updateMember = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: m } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, archived_at").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
+    const { data: m } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, archived_at, approved_at").eq("id", data.memberId).eq("organization_id", org).maybeSingle();
     if (!m) throw new Error("Associação não encontrada");
     if (m.user_id === context.userId) throw new Error("Você não pode alterar o próprio acesso.");
     const isArchived = !!m.archived_at;
@@ -96,6 +96,7 @@ export const updateMember = createServerFn({ method: "POST" })
     }
     const now = new Date().toISOString();
     const patch: Record<string, unknown> = { role: nextRole, active: nextActive, updated_at: now };
+    if (nextActive && !m.approved_at) { patch["approved_at"] = now; patch["approved_by"] = context.userId; }
     if (data.archive === true) { patch["archived_at"] = now; patch["archived_by"] = context.userId; }
     if (data.archive === false) { patch["archived_at"] = null; patch["archived_by"] = null; }
     const { error } = await supabaseAdmin.from("organization_members").update(patch as never).eq("id", m.id);
@@ -110,7 +111,7 @@ export const listMembers = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const org = await requireAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: members } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, created_at, archived_at").eq("organization_id", org).order("created_at");
+    const { data: members } = await supabaseAdmin.from("organization_members").select("id, user_id, role, active, created_at, archived_at, approved_at").eq("organization_id", org).order("created_at");
     const { data: invites } = await supabaseAdmin.from("invitations").select("id, email, phone, full_name, role, expires_at, used_at, revoked_at, created_at").eq("organization_id", org).order("created_at", { ascending: false }).limit(100);
     const ids = (members ?? []).map((m) => m.user_id);
     const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, phone").in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
