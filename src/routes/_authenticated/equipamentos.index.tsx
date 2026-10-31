@@ -12,6 +12,7 @@ import { equipmentFields } from "@/components/fields";
 import { useMe } from "@/hooks/use-membership";
 import { PERM } from "@/lib/domain";
 import { formatNumber } from "@/lib/format";
+import { DeleteEquipmentButton } from "@/components/equipment-delete";
 
 
 export const Route = createFileRoute("/_authenticated/equipamentos/")({
@@ -44,7 +45,7 @@ function Page() {
               <td className={td}>{e.manufacturer} {e.model}<div className="text-xs text-muted-foreground">{e.type}</div></td>
               <td className={td}>{e.customers?.legal_name}</td><td className={td}>{e.hour_meter !== null ? `${formatNumber(e.hour_meter)} h` : "—"}</td>
               <td className={td}><GenericStatus value={e.status} archived={!!e.archived_at} /></td>
-              <td className={`${td} text-right`}>{PERM.manage(me.role) && <Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: e as never, archive: !e.archived_at, userId: me.userId })}>{e.archived_at ? "Restaurar" : "Arquivar"}</Button>}</td></tr>
+              <td className={`${td} text-right`}>{PERM.manage(me.role) && <div className="flex justify-end gap-1"><Button size="sm" variant="ghost" onClick={() => arch.mutate({ row: e as never, archive: !e.archived_at, userId: me.userId })}>{e.archived_at ? "Restaurar" : "Arquivar"}</Button><DeleteEquipmentButton id={e.id} serial={e.serial} /></div>}</td></tr>
           ))}
         </Table>
       )}

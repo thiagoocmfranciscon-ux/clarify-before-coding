@@ -1636,6 +1636,8 @@ export type Database = {
           checklist: Json
           closed_at: string | null
           closed_by: string | null
+          consultant: string | null
+          contact: string | null
           created_at: string
           created_by: string | null
           customer_id: string
@@ -1644,17 +1646,26 @@ export type Database = {
           diagnosis_started_at: string | null
           due_date: string | null
           equipment_id: string
+          equipment_kind: string | null
+          equipment_year: number | null
           execution_started_at: string | null
+          fleet_number: string | null
           hour_meter_reading: number | null
           id: string
+          items: Json
+          notes: string | null
           number: string
           opened_at: string
           organization_id: string
           parent_work_order_id: string | null
           priority: Database["public"]["Enums"]["wo_priority"]
+          requester_name: string | null
+          requester_sector: string | null
+          services_amount: number | null
           solution: string | null
           status: Database["public"]["Enums"]["wo_status"]
           tech_completed_at: string | null
+          technician_name: string | null
           type: Database["public"]["Enums"]["wo_type"]
           updated_at: string
           version: number
@@ -1665,6 +1676,8 @@ export type Database = {
           checklist?: Json
           closed_at?: string | null
           closed_by?: string | null
+          consultant?: string | null
+          contact?: string | null
           created_at?: string
           created_by?: string | null
           customer_id: string
@@ -1673,17 +1686,26 @@ export type Database = {
           diagnosis_started_at?: string | null
           due_date?: string | null
           equipment_id: string
+          equipment_kind?: string | null
+          equipment_year?: number | null
           execution_started_at?: string | null
+          fleet_number?: string | null
           hour_meter_reading?: number | null
           id?: string
+          items?: Json
+          notes?: string | null
           number: string
           opened_at?: string
           organization_id: string
           parent_work_order_id?: string | null
           priority?: Database["public"]["Enums"]["wo_priority"]
+          requester_name?: string | null
+          requester_sector?: string | null
+          services_amount?: number | null
           solution?: string | null
           status?: Database["public"]["Enums"]["wo_status"]
           tech_completed_at?: string | null
+          technician_name?: string | null
           type: Database["public"]["Enums"]["wo_type"]
           updated_at?: string
           version?: number
@@ -1694,6 +1716,8 @@ export type Database = {
           checklist?: Json
           closed_at?: string | null
           closed_by?: string | null
+          consultant?: string | null
+          contact?: string | null
           created_at?: string
           created_by?: string | null
           customer_id?: string
@@ -1702,17 +1726,26 @@ export type Database = {
           diagnosis_started_at?: string | null
           due_date?: string | null
           equipment_id?: string
+          equipment_kind?: string | null
+          equipment_year?: number | null
           execution_started_at?: string | null
+          fleet_number?: string | null
           hour_meter_reading?: number | null
           id?: string
+          items?: Json
+          notes?: string | null
           number?: string
           opened_at?: string
           organization_id?: string
           parent_work_order_id?: string | null
           priority?: Database["public"]["Enums"]["wo_priority"]
+          requester_name?: string | null
+          requester_sector?: string | null
+          services_amount?: number | null
           solution?: string | null
           status?: Database["public"]["Enums"]["wo_status"]
           tech_completed_at?: string | null
+          technician_name?: string | null
           type?: Database["public"]["Enums"]["wo_type"]
           updated_at?: string
           version?: number
@@ -1766,6 +1799,8 @@ export type Database = {
           checklist: Json
           closed_at: string | null
           closed_by: string | null
+          consultant: string | null
+          contact: string | null
           created_at: string
           created_by: string | null
           customer_id: string
@@ -1774,17 +1809,75 @@ export type Database = {
           diagnosis_started_at: string | null
           due_date: string | null
           equipment_id: string
+          equipment_kind: string | null
+          equipment_year: number | null
           execution_started_at: string | null
+          fleet_number: string | null
           hour_meter_reading: number | null
           id: string
+          items: Json
+          notes: string | null
           number: string
           opened_at: string
           organization_id: string
           parent_work_order_id: string | null
           priority: Database["public"]["Enums"]["wo_priority"]
+          requester_name: string | null
+          requester_sector: string | null
+          services_amount: number | null
           solution: string | null
           status: Database["public"]["Enums"]["wo_status"]
           tech_completed_at: string | null
+          technician_name: string | null
+          type: Database["public"]["Enums"]["wo_type"]
+          updated_at: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "work_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_work_order_manual: {
+        Args: { p: Json }
+        Returns: {
+          cancel_reason: string | null
+          canceled_at: string | null
+          checklist: Json
+          closed_at: string | null
+          closed_by: string | null
+          consultant: string | null
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string
+          diagnosis: string | null
+          diagnosis_started_at: string | null
+          due_date: string | null
+          equipment_id: string
+          equipment_kind: string | null
+          equipment_year: number | null
+          execution_started_at: string | null
+          fleet_number: string | null
+          hour_meter_reading: number | null
+          id: string
+          items: Json
+          notes: string | null
+          number: string
+          opened_at: string
+          organization_id: string
+          parent_work_order_id: string | null
+          priority: Database["public"]["Enums"]["wo_priority"]
+          requester_name: string | null
+          requester_sector: string | null
+          services_amount: number | null
+          solution: string | null
+          status: Database["public"]["Enums"]["wo_status"]
+          tech_completed_at: string | null
+          technician_name: string | null
           type: Database["public"]["Enums"]["wo_type"]
           updated_at: string
           version: number
@@ -1797,6 +1890,7 @@ export type Database = {
         }
       }
       dashboard_kpis: { Args: { p_from: string; p_to: string }; Returns: Json }
+      delete_equipment: { Args: { p_id: string }; Returns: undefined }
       effective_role: {
         Args: { _r: Database["public"]["Enums"]["app_role"] }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -1891,6 +1985,8 @@ export type Database = {
           checklist: Json
           closed_at: string | null
           closed_by: string | null
+          consultant: string | null
+          contact: string | null
           created_at: string
           created_by: string | null
           customer_id: string
@@ -1899,17 +1995,26 @@ export type Database = {
           diagnosis_started_at: string | null
           due_date: string | null
           equipment_id: string
+          equipment_kind: string | null
+          equipment_year: number | null
           execution_started_at: string | null
+          fleet_number: string | null
           hour_meter_reading: number | null
           id: string
+          items: Json
+          notes: string | null
           number: string
           opened_at: string
           organization_id: string
           parent_work_order_id: string | null
           priority: Database["public"]["Enums"]["wo_priority"]
+          requester_name: string | null
+          requester_sector: string | null
+          services_amount: number | null
           solution: string | null
           status: Database["public"]["Enums"]["wo_status"]
           tech_completed_at: string | null
+          technician_name: string | null
           type: Database["public"]["Enums"]["wo_type"]
           updated_at: string
           version: number

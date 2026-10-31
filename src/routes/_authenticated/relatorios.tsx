@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { FileDown, FileSpreadsheet } from "lucide-react";
+import { FileDown, FileSpreadsheet, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, Field, NoPermission, PageHeader } from "@/components/kit";
+import { Card, Field, NoPermission, PageHeader, textareaClass } from "@/components/kit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMe } from "@/hooks/use-membership";
 import { PERM, STOCK_ALERT_LABEL, WO_STATUS_LABEL, WO_TYPE_LABEL, stockAlert } from "@/lib/domain";
-import { addDays, firstDayOfMonth, spDate } from "@/lib/format";
+import { addDays, firstDayOfMonth, parseDecimal, spDate } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
 import { exportPdf, exportXlsx, type Column } from "@/lib/reports";
 
@@ -88,6 +88,53 @@ function Page() {
           </Card>
         ))}
       </div>
+      <ManualReport from={from} to={to} />
     </>
+  );
+}
+
+type Line = { d: string; q: string; v: string; o: string };
+const MANUAL_COLS: Column[] = [{ header: "Descrição", key: "d" }, { header: "Quantidade", key: "q", type: "number" }, { header: "Valor", key: "v", type: "money" }, { header: "Observação", key: "o" }];
+
+function ManualReport({ from, to }: { from: string; to: string }) {
+  const [title, setTitle] = useState(""); const [body, setBody] = useState(""); const [lines, setLines] = useState<Line[]>([{ d: "", q: "", v: "", o: "" }]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const setLine = (i: number, k: keyof Line, val: string) => setLines((a) => a.map((l, j) => (j === i ? { ...l, [k]: val } : l)));
+  async function go(fmt: "pdf" | "xlsx") {
+    if (!title.trim()) { toast.error("Informe o título do relatório"); return; }
+    const rows = lines.filter((l) => l.d.trim() || l.o.trim()).map((l) => ({ d: l.d, q: parseDecimal(l.q), v: parseDecimal(l.v), o: l.o }));
+    setBusy(fmt);
+    try {
+      const params = { from, to, manual: true, title };
+      const period = `Período: ${from.split("-").reverse().join("/")} a ${to.split("-").reverse().join("/")}`;
+      if (fmt === "xlsx") await exportXlsx("relatorio_manual", title.trim(), MANUAL_COLS, rows, params);
+      else await exportPdf("relatorio_manual", title.trim(), MANUAL_COLS, rows, params, body.trim() ? `${period} — ${body.trim()}` : period);
+    } catch (e) { toast.error(friendlyError(e)); } finally { setBusy(null); }
+  }
+  return (
+    <Card className="mt-6">
+      <h2 className="font-semibold">Relatório manual</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Monte um relatório à mão e baixe em PDF ou Excel. Usa o período escolhido acima.</p>
+      <div className="mt-3 grid gap-3">
+        <Field id="mr-t" label="Título" required><Input id="mr-t" className="h-11" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} /></Field>
+        <Field id="mr-b" label="Texto (opcional)"><textarea id="mr-b" className={textareaClass} value={body} onChange={(e) => setBody(e.target.value)} maxLength={4000} /></Field>
+        <div className="space-y-2">
+          {lines.map((l, i) => (
+            <div key={i} className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_100px_120px_1fr_40px]">
+              <Input className="h-10" placeholder="Descrição" value={l.d} onChange={(e) => setLine(i, "d", e.target.value)} aria-label="Descrição" />
+              <Input className="h-10" inputMode="decimal" placeholder="Qtd." value={l.q} onChange={(e) => setLine(i, "q", e.target.value)} aria-label="Quantidade" />
+              <Input className="h-10" inputMode="decimal" placeholder="Valor (R$)" value={l.v} onChange={(e) => setLine(i, "v", e.target.value)} aria-label="Valor" />
+              <Input className="h-10" placeholder="Observação" value={l.o} onChange={(e) => setLine(i, "o", e.target.value)} aria-label="Observação" />
+              <Button type="button" size="icon" variant="ghost" onClick={() => setLines((a) => a.filter((_, j) => j !== i))} aria-label="Remover linha"><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={() => setLines((a) => [...a, { d: "", q: "", v: "", o: "" }])}><Plus className="mr-1 h-4 w-4" />Adicionar linha</Button>
+        </div>
+      </div>
+      <div className="mt-4 flex gap-2">
+        <Button className="min-h-11" disabled={!!busy} onClick={() => go("pdf")}><FileDown className="mr-1 h-4 w-4" />{busy === "pdf" ? "Gerando…" : "PDF"}</Button>
+        <Button variant="outline" className="min-h-11" disabled={!!busy} onClick={() => go("xlsx")}><FileSpreadsheet className="mr-1 h-4 w-4" />{busy === "xlsx" ? "Gerando…" : "Excel"}</Button>
+      </div>
+    </Card>
   );
 }

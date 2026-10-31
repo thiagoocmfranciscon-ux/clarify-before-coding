@@ -16,7 +16,7 @@ import { useMe } from "@/hooks/use-membership";
 import { PERM, WO_PRIORITY_LABEL, WO_STATUS_LABEL, WO_TYPE_LABEL, allowedTransitions, transitionNeedsReason, type WoStatus } from "@/lib/domain";
 import { formatBRL, formatDate, formatDateTime, formatNumber, parseDecimal } from "@/lib/format";
 import { friendlyError } from "@/lib/errors";
-import { downloadWoReport } from "@/lib/reports";
+import { downloadWoReport, downloadWoSheet } from "@/lib/reports";
 
 const DEFAULT_CHECKLIST = ["Inspeção de segurança realizada", "Teste de funcionamento após o serviço", "Vazamentos verificados", "Área limpa e organizada", "Cliente informado"];
 const EXP = { deslocamento: "Deslocamento", terceiros: "Serviço de terceiros", alimentacao: "Alimentação", hospedagem: "Hospedagem", outros: "Outros" };
@@ -77,6 +77,7 @@ function Page() {
           {next.map((s) => <Button key={s} variant={s === "cancelada" ? "outline" : "default"} className="min-h-11" onClick={() => setTrans(s)}>{s === "em_andamento" && wo.status === "concluida_tecnicamente" ? "Reabrir (retrabalho)" : `→ ${WO_STATUS_LABEL[s]}`}</Button>)}
           {PERM.manage(me.role) && wo.status === "encerrada" && <Button variant="outline" className="min-h-11" onClick={() => setRework(true)}>OS de retrabalho</Button>}
           <Button variant="outline" className="min-h-11" onClick={() => downloadWoReport(q.data!, PERM.seeCosts(me.role)).catch((e) => toast.error(friendlyError(e)))}><FileDown className="mr-1 h-4 w-4" />Laudo PDF</Button>
+          <Button variant="outline" className="min-h-11" onClick={() => downloadWoSheet(q.data!.wo as never, q.data!.assigns.map((a) => a.technicians?.name).filter(Boolean).join(", ")).catch((e) => toast.error(friendlyError(e)))}><FileDown className="mr-1 h-4 w-4" />Imprimir OS (PDF)</Button>
         </>} />
       <Tabs defaultValue="resumo">
         <TabsList className="mb-4 flex h-auto flex-wrap">
@@ -125,6 +126,13 @@ function Summary({ data, onChange }: { data: Data; onChange: () => void }) {
           <div>Cliente: {wo.customers && <Link to="/clientes/$id" params={{ id: wo.customers.id }} className="text-primary hover:underline">{wo.customers.legal_name}</Link>}</div>
           <div>Equipamento: {wo.equipment && <Link to="/equipamentos/$id" params={{ id: wo.equipment.id }} className="text-primary hover:underline">{wo.equipment.serial}</Link>}</div>
           <div>Horímetro na abertura: {wo.hour_meter_reading !== null ? `${formatNumber(wo.hour_meter_reading)} h` : "—"}</div>
+          {wo.requester_name && <div>Solicitante: {wo.requester_name}{wo.requester_sector ? ` · ${wo.requester_sector}` : ""}</div>}
+          {wo.consultant && <div>Consultor: {wo.consultant}</div>}
+          {wo.contact && <div>Contato: {wo.contact}</div>}
+          {wo.fleet_number && <div>Frota: {wo.fleet_number}</div>}
+          {(wo.equipment_kind || wo.equipment_year) && <div>Equipamento: {[wo.equipment_kind, wo.equipment_year].filter(Boolean).join(" · ")}</div>}
+          {wo.technician_name && <div>Técnico (informado): {wo.technician_name}</div>}
+          {wo.notes && <div className="sm:col-span-2">Observações: {wo.notes}</div>}
           {wo.parent_work_order_id && <div>Retrabalho de: <Link to="/os/$id" params={{ id: wo.parent_work_order_id }} className="text-primary hover:underline">OS de origem</Link></div>}
           {wo.cancel_reason && <div className="sm:col-span-2 text-destructive">Motivo do cancelamento: {wo.cancel_reason}</div>}
         </dl>
