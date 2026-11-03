@@ -11,10 +11,12 @@ import { friendlyError } from "@/lib/errors";
 import { parseDecimal } from "@/lib/format";
 
 export type FieldDef = {
-  key: string; label: string; type?: "text" | "number" | "select" | "textarea" | "date" | "email";
+  key: string; label: string; type?: "text" | "number" | "select" | "textarea" | "date" | "email" | "datalist";
   options?: { value: string; label: string }[]; required?: boolean; hint?: string;
   /** Converte o texto digitado no valor gravado. Retorne `{ error }` para bloquear. */
   parse?: (v: string) => unknown;
+  /** Resolve o texto digitado (datalist) para o valor gravado; pode criar registros. Retorne `{ error }` para bloquear. */
+  resolve?: (v: string) => Promise<unknown>;
 };
 
 type Row = Record<string, unknown> & { id?: string; version?: number };
@@ -53,7 +55,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
     onError: (e) => toast.error(friendlyError(e)),
   });
 
-  function submit() {
+  async function submit() {
     const e: Record<string, string> = {}; const payload: Record<string, unknown> = {};
     for (const f of fields) {
       const raw = (vals[f.key] ?? "").trim();
@@ -61,6 +63,10 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
       let v: unknown = raw === "" ? null : raw;
       if (f.type === "number" && raw) { const n = parseDecimal(raw); if (n === null || Number.isNaN(n)) { e[f.key] = "Número inválido"; continue; } v = n; }
       if (f.parse && raw) { const p = f.parse(raw); if (p && typeof p === "object" && "error" in (p as object)) { e[f.key] = (p as { error: string }).error; continue; } v = p; }
+      if (f.resolve && raw) {
+        try { const r = await f.resolve(raw); if (r && typeof r === "object" && "error" in (r as object)) { e[f.key] = (r as { error: string }).error; continue; } v = r; }
+        catch (err) { e[f.key] = friendlyError(err); continue; }
+      }
       payload[f.key] = v;
     }
     setErrors(e);
@@ -79,6 +85,11 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
                   {!f.required && <option value="">—</option>}
                   {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+              ) : f.type === "datalist" ? (
+                <>
+                  <Input id={`f-${f.key}`} className="h-11" list={`dl-${f.key}`} value={vals[f.key] ?? ""} onChange={(ev) => setVals((p) => ({ ...p, [f.key]: ev.target.value }))} />
+                  <datalist id={`dl-${f.key}`}>{f.options?.map((o) => <option key={o.value} value={o.label} />)}</datalist>
+                </>
               ) : f.type === "textarea" ? (
                 <textarea id={`f-${f.key}`} className={textareaClass} value={vals[f.key] ?? ""} onChange={(ev) => setVals((p) => ({ ...p, [f.key]: ev.target.value }))} />
               ) : (
