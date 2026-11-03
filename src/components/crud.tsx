@@ -85,6 +85,11 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
                   {!f.required && <option value="">—</option>}
                   {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+              ) : f.type === "datalist" ? (
+                <>
+                  <Input id={`f-${f.key}`} className="h-11" list={`dl-${f.key}`} value={vals[f.key] ?? ""} onChange={(ev) => setVals((p) => ({ ...p, [f.key]: ev.target.value }))} />
+                  <datalist id={`dl-${f.key}`}>{f.options?.map((o) => <option key={o.value} value={o.label} />)}</datalist>
+                </>
               ) : f.type === "textarea" ? (
                 <textarea id={`f-${f.key}`} className={textareaClass} value={vals[f.key] ?? ""} onChange={(ev) => setVals((p) => ({ ...p, [f.key]: ev.target.value }))} />
               ) : (
