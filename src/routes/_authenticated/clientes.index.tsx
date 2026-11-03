@@ -26,7 +26,7 @@ function Page() {
     queryFn: async () => {
       let s = supabase.from("customers").select("id, version, legal_name, trade_name, city, uf, status, archived_at, equipment(count)").order("legal_name").limit(200);
       s = archived ? s.not("archived_at", "is", null) : s.is("archived_at", null);
-      if (q.trim()) s = s.or(`legal_name.ilike.%${q.trim()}%,trade_name.ilike.%${q.trim()}%`);
+      const t = q.replace(/[%_,()*\\]/g, " ").trim(); if (t) s = s.or(`legal_name.ilike.%${t}%,trade_name.ilike.%${t}%`);
       const { data, error } = await s; if (error) throw error; return data;
     },
   });
