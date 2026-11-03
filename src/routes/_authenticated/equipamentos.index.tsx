@@ -60,7 +60,7 @@ function Page() {
           ))}
         </Table>
       )}
-      <CrudDialog open={open} onOpenChange={(o) => { setOpen(o); setCust(""); }} table="equipment" title="equipamento" fields={fields} invalidate={[["equipment"]]} />
+      <CrudDialog open={open} onOpenChange={(o) => { setOpen(o); setCust(""); }} table="equipment" title="equipamento" fields={fields} invalidate={[["equipment"], ["customers-min"]]} />
     </>
   );
 }
