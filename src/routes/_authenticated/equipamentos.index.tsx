@@ -33,7 +33,18 @@ function Page() {
       const { data, error } = await s; if (error) throw error; return data;
     },
   });
-  const fields: FieldDef[] = [{ key: "customer_id", label: "Cliente", type: "select", required: true, options: (customers.data ?? []).map((c) => ({ value: c.id, label: c.legal_name })) }, ...equipmentFields];
+  const fields: FieldDef[] = [{
+    key: "customer_id", label: "Cliente", type: "datalist", required: true,
+    hint: "Digite o nome; se for um cliente novo, ele é cadastrado automaticamente.",
+    options: (customers.data ?? []).map((c) => ({ value: c.id, label: c.legal_name })),
+    resolve: async (name) => {
+      const found = (customers.data ?? []).find((c) => c.legal_name.trim().toLowerCase() === name.trim().toLowerCase());
+      if (found) return found.id;
+      const { data, error } = await supabase.from("customers").insert({ legal_name: name.trim() } as never).select("id").single();
+      if (error) throw error;
+      return (data as { id: string }).id;
+    },
+  }, ...equipmentFields];
   return (
     <>
       <PageHeader title="Equipamentos" actions={PERM.manage(me.role) && <Button className="min-h-11" onClick={() => setOpen(true)}><Plus className="mr-1 h-4 w-4" />Novo equipamento</Button>} />
