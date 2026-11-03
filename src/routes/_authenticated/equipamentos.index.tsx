@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/equipamentos/")({
 });
 
 function Page() {
-  const me = useMe(); const [q, setQ] = useState(""); const [open, setOpen] = useState(false); const [cust, setCust] = useState(""); const [archived, setArchived] = useState(false);
+  const me = useMe(); const [q, setQ] = useState(""); const [open, setOpen] = useState(false); const [archived, setArchived] = useState(false);
   const arch = useArchive("equipment", [["equipment"]]);
   const customers = useQuery({ queryKey: ["customers-min"], queryFn: async () => (await supabase.from("customers").select("id, legal_name").is("archived_at", null).order("legal_name")).data ?? [] });
   const list = useQuery({
@@ -29,7 +29,7 @@ function Page() {
     queryFn: async () => {
       let s = supabase.from("equipment").select("id, version, serial, manufacturer, model, type, status, hour_meter, archived_at, customers(legal_name)").order("serial").limit(300);
       s = archived ? s.not("archived_at", "is", null) : s.is("archived_at", null);
-      if (q.trim()) s = s.or(`serial.ilike.%${q.trim()}%,model.ilike.%${q.trim()}%,manufacturer.ilike.%${q.trim()}%`);
+      const t = q.replace(/[%_,()*\\]/g, " ").trim(); if (t) s = s.or(`serial.ilike.%${t}%,model.ilike.%${t}%,manufacturer.ilike.%${t}%`);
       const { data, error } = await s; if (error) throw error; return data;
     },
   });
@@ -60,7 +60,7 @@ function Page() {
           ))}
         </Table>
       )}
-      <CrudDialog open={open} onOpenChange={(o) => { setOpen(o); setCust(""); }} table="equipment" title="equipamento" fields={fields} invalidate={[["equipment"], ["customers-min"]]} />
+      <CrudDialog open={open} onOpenChange={setOpen} table="equipment" title="equipamento" fields={fields} invalidate={[["equipment"], ["customers-min"]]} />
     </>
   );
 }
