@@ -21,16 +21,15 @@ export const equipmentFields: FieldDef[] = [
 ];
 
 export const plateParse = (v: string) => { const p = normalizePlate(v); return isValidPlate(p) ? p : { error: "Placa inválida (ABC1234 ou ABC1D23)" }; };
+export const fleetSerialParse = (v: string) => v.trim() || { error: "Informe a série" };
 const intParse = (v: string) => (/^\d+$/.test(v.replace(/\./g, "")) ? Number(v.replace(/\./g, "")) : { error: "Número inteiro" });
-export const vehicleFields = (drivers: { value: string; label: string }[]): FieldDef[] => [
-  { key: "plate", label: "Placa", required: true, parse: plateParse },
+export const vehicleFields = (): FieldDef[] => [
+  { key: "plate", label: "Série", required: true, parse: fleetSerialParse },
   { key: "model", label: "Modelo", required: true },
   { key: "year", label: "Ano", parse: intParse },
-  { key: "type", label: "Tipo", required: true, hint: "Ex.: Utilitário, Caminhão munck" },
-  { key: "odometer", label: "Odômetro (km)", parse: intParse },
-  { key: "driver_technician_id", label: "Motorista", type: "select", options: drivers },
+  { key: "type", label: "Tipo", required: true, hint: "Ex.: Empilhadeira, Transpaleteira" },
+  { key: "odometer", label: "Horímetro (h)", parse: intParse },
   { key: "status", label: "Situação", type: "select", required: true, options: [{ value: "disponivel", label: "Disponível" }, { value: "em_uso", label: "Em uso" }, { value: "em_manutencao", label: "Em manutenção" }, { value: "inativo", label: "Inativo" }] },
-  { key: "next_service_km", label: "Próxima revisão (km)", parse: intParse },
+  { key: "next_service_km", label: "Próxima revisão (h)", parse: intParse },
   { key: "next_service_date", label: "Próxima revisão (data)", type: "date" },
-  { key: "insurance_due", label: "Vencimento do seguro", type: "date" },
 ];

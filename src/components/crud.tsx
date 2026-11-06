@@ -27,9 +27,9 @@ function toText(v: unknown): string {
 }
 
 /** Formulário genérico de criação/edição. Edição usa controle de versão (otimista). */
-export function CrudDialog({ open, onOpenChange, table, title, fields, row, extra, invalidate, idKey = "id" }: {
+export function CrudDialog({ open, onOpenChange, table, title, fields, row, extra, invalidate, idKey = "id", createTitle }: {
   open: boolean; onOpenChange: (o: boolean) => void; table: string; title: string; fields: FieldDef[];
-  row?: Row | null | undefined; extra?: Record<string, unknown> | undefined; invalidate: unknown[][]; idKey?: string;
+  row?: Row | null | undefined; extra?: Record<string, unknown> | undefined; invalidate: unknown[][]; idKey?: string; createTitle?: string;
 }) {
   const [vals, setVals] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -76,7 +76,7 @@ export function CrudDialog({ open, onOpenChange, table, title, fields, row, extr
   return (
     <Dialog open={open} onOpenChange={(o) => !m.isPending && onOpenChange(o)}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader><DialogTitle>{row?.[idKey] ? `Editar ${title}` : `Novo ${title}`}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{row?.[idKey] ? `Editar ${title}` : createTitle ?? `Novo ${title}`}</DialogTitle></DialogHeader>
         <form className="grid gap-3" onSubmit={(ev) => { ev.preventDefault(); submit(); }} noValidate>
           {fields.map((f) => (
             <Field key={f.key} id={`f-${f.key}`} label={f.label} required={!!f.required} error={errors[f.key]} hint={f.hint}>
