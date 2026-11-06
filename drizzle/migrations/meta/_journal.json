@@ -99,6 +99,13 @@
       "when": 1793417154348,
       "tag": "0013_rh_checklists_read_only",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1793963857790,
+      "tag": "0014_fleet_serial_identifier",
+      "breakpoints": true
     }
   ]
 }
