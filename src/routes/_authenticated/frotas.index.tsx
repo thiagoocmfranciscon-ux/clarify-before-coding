@@ -48,7 +48,7 @@ function Page() {
         </Table>
       )}
       <p className="mt-3 text-xs text-muted-foreground">Rastreamento em tempo real: integração não configurada.</p>
-      <CrudDialog open={open} onOpenChange={setOpen} table="vehicles" title="frota" fields={vehicleFields()} invalidate={[["vehicles"]]} />
+      <CrudDialog open={open} onOpenChange={setOpen} table="vehicles" title="frota" createTitle="Adicionar frota" fields={vehicleFields()} invalidate={[["vehicles"]]} />
     </>
   );
 }
