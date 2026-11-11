@@ -10,7 +10,7 @@ import { PERM } from "@/lib/domain";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
-  head: () => ({ meta: [{ title: "Auditoria — Empilha Nobre" }, { name: "description", content: "Registro de alterações e exportações." }, { property: "og:title", content: "Auditoria — Empilha Nobre" }, { property: "og:description", content: "Registro de alterações." }] }),
+  head: () => ({ meta: [{ title: "Auditoria — Empilha Nobre" }, { name: "description", content: "Registro de alterações e exportações." }, { property: "og:title", content: "Auditoria — Empilha Nobre" }, { property: "og:description", content: "Registro de alterações." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Page,
 });
 
@@ -19,7 +19,7 @@ const PAGE = 50;
 function Page() {
   const me = useMe(); const [page, setPage] = useState(1); const [entity, setEntity] = useState("");
   const q = useQuery({
-    queryKey: ["audit", page, entity], enabled: PERM.audit(me.role),
+    queryKey: ["audit", me.userId, me.organizationId, me.realRole, page, entity], enabled: PERM.audit(me.realRole),
     queryFn: async () => {
       let s = supabase.from("audit_events").select("*", { count: "exact" }).order("created_at", { ascending: false }).range((page - 1) * PAGE, page * PAGE - 1);
       if (entity.trim()) s = s.ilike("entity", `%${entity.trim()}%`);
@@ -29,7 +29,7 @@ function Page() {
       return { rows: data, count: count ?? 0, names: Object.fromEntries((profs ?? []).map((p) => [p.id, p.full_name])) };
     },
   });
-  if (!PERM.audit(me.role)) return <NoPermission />;
+  if (!PERM.audit(me.realRole)) return <NoPermission />;
   return (
     <>
       <PageHeader title="Auditoria" description="Quem fez o quê e quando. Os registros não podem ser alterados." />

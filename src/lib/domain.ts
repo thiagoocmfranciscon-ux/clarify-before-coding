@@ -134,7 +134,8 @@ export const PERM = {
   seeStock: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "almoxarife" || r === "leitura" || r === "tecnico",
   export: (r?: AppRole | null) => r === "admin" || r === "gestor",
   fleet: (r?: AppRole | null) => r === "admin" || r === "gestor" || r === "leitura" || r === "almoxarife",
-  audit: (r?: AppRole | null) => r === "admin" || r === "gestor",
+  /** Auditoria exige o papel cadastrado, sem conversão para nível efetivo. */
+  audit: (r?: AppRole | null) => r === "admin",
 };
 
 /** Situação do usuário: arquivado tem prioridade sobre ativo/revogado. */

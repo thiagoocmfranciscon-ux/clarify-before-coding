@@ -33,9 +33,9 @@ const NAV: NavItem[] = [
   { to: "/auditoria", label: "Auditoria", icon: History, show: PERM.audit, group: "Gestão" },
 ];
 
-function SidebarNav({ role, onNavigate }: { role: AppRole; onNavigate?: () => void }) {
+function SidebarNav({ role, realRole, onNavigate }: { role: AppRole; realRole: AppRole; onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const items = NAV.filter((n) => n.show(role));
+  const items = NAV.filter((n) => n.show(n.to === "/auditoria" ? realRole : role));
   const groups = [...new Set(items.map((n) => n.group))];
   return (
     <nav aria-label="Principal" className="flex flex-col gap-5 px-3">
@@ -121,7 +121,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const side = (
     <div className="flex h-full min-h-0 flex-col bg-sidebar bg-gradient-to-b from-sidebar to-sidebar-accent/40 py-6">
       <div className="flex shrink-0 justify-center px-5 pb-7"><BrandLockup inverted /></div>
-      <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"><SidebarNav role={me.role} onNavigate={() => setOpen(false)} /></div>
+      <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"><SidebarNav role={me.role} realRole={me.realRole} onNavigate={() => setOpen(false)} /></div>
       <div className="shrink-0 px-5 pt-4 text-center text-[10px] tracking-wide text-sidebar-foreground/40">Empilha Nobre · Distribuidor HELI</div>
     </div>
   );
