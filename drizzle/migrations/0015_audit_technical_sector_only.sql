@@ -1,0 +1,1 @@
+CREATE POLICY audit_technical_sector_only ON public.audit_events AS RESTRICTIVE FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.organization_members m WHERE m.organization_id = audit_events.organization_id AND m.user_id = auth.uid() AND m.active = true AND m.archived_at IS NULL AND m.role = 'admin'::public.app_role));
